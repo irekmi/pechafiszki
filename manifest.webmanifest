@@ -1,0 +1,14 @@
+{
+  "name": "Fiszki rekrutacyjne",
+  "short_name": "Fiszki",
+  "description": "200 pytan i odpowiedzi rekrutacyjnych: PHP, Symfony, SQL, API, React, TypeScript, architektura.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1320",
+  "theme_color": "#0e1320",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,4 @@
+.agent-team/
+node_modules/
+.env
+.next/

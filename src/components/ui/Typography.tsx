@@ -30,3 +30,6 @@ export function Muted({ className, children }: TextProps) {
 export function Hint({ className, children }: TextProps) {
   return <p className={cn("text-ink-3 text-13", className)}>{children}</p>;
 }
+
+/** `.flashcard__question` — the mockups' question type: 27 px, 21 px below the breakpoint. */
+export const QUESTION_CLASS = "font-display font-semibold text-21 md:text-27 leading-card";

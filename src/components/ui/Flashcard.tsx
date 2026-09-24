@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { cn } from "./cn";
+import { QUESTION_CLASS } from "./Typography";
 
 /** `.flashcard__label` */
 const LABEL = "font-display font-bold text-12 leading-none tracking-label uppercase text-ink-2";
@@ -48,14 +49,7 @@ export function Flashcard({
       )}
     >
       {badges ? <div className="flex justify-between gap-3 items-center">{badges}</div> : null}
-      <h2
-        className={cn(
-          "font-display font-semibold leading-card",
-          preview ? "text-20" : "text-21 md:text-27",
-        )}
-      >
-        {question}
-      </h2>
+      <h2 className={cn(QUESTION_CLASS, preview && "text-20 md:text-20")}>{question}</h2>
       {flippable ? (
         <p className="flex items-center gap-2 text-13 text-ink-3">
           {revealed ? HINT_HIDE : HINT_SHOW}

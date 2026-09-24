@@ -14,13 +14,16 @@ const TONE: Record<NoticeTone, string> = {
 type NoticeProps = {
   tone?: NoticeTone;
   icon?: ReactNode;
+  /** `role="alert"`, as the mockups mark a notice that appears in response to an action. */
+  role?: "alert" | "status";
   className?: string;
   children: ReactNode;
 };
 
-export function Notice({ tone = "info", icon, className, children }: NoticeProps) {
+export function Notice({ tone = "info", icon, role, className, children }: NoticeProps) {
   return (
     <div
+      role={role}
       className={cn(
         "flex gap-3 items-start px-4.5 py-3.5 rounded-md text-14 border-2 border-current",
         TONE[tone],

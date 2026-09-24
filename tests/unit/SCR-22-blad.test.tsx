@@ -1,7 +1,11 @@
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ErrorScreen } from "@/components/error/ErrorScreen";
+
+// ST-03 gave the guest action a sign-out path (API-38); the action itself pulls in Auth.js, which
+// this render test has no use for.
+vi.mock("@/server/actions/signOut", () => ({ signOutAction: vi.fn() }));
 
 const render = (markup: ReactElement) => renderToStaticMarkup(markup);
 
@@ -25,6 +29,13 @@ describe("SCR-22 — błąd", () => {
     expect(html).toContain("Wróć na start");
     expect(html).toContain("Przeglądaj fiszki");
     expect(html).not.toContain("Wróć do logowania");
+  });
+
+  it("clears a stale session cookie instead of linking, when one is present (API-38)", () => {
+    const html = render(<ErrorScreen variant="404" signedIn={false} staleSession />);
+    expect(html).toContain("Wróć do logowania");
+    expect(html).toContain("<form");
+    expect(html).not.toContain('href="/logowanie"');
   });
 
   it("shows a guest only Wróć do logowania — the other two are absent from the DOM", () => {

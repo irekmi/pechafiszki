@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -16,5 +17,8 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Auth.js refuses to start without a secret. None is committed: the run generates a throwaway
+    // one unless the environment already carries a real value (CLAUDE.md §8).
+    env: { AUTH_SECRET: process.env.AUTH_SECRET ?? randomBytes(32).toString("base64") },
   },
 });

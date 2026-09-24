@@ -21,8 +21,8 @@ export function Field({ label, htmlFor, hint, error, className, children }: Fiel
       <label className="text-13 font-bold text-ink" htmlFor={htmlFor}>
         {label}
       </label>
-      {hint ? <p className="text-12 text-ink-3">{hint}</p> : null}
       {children}
+      {hint ? <p className="text-12 text-ink-3">{hint}</p> : null}
       {error ? <p className="text-13 font-semibold text-cta-ink">{error}</p> : null}
     </div>
   );

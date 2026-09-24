@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/server/db";
 import { authorizeCredentials, verifyCredentials } from "@/server/services/signIn";
 import { resetDatabase } from "./setup/fixtures";
+import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
 
 /** The real argon2, with `verify` observed: the timing claim is about the code path it runs. */
 const { verifySpy } = vi.hoisted(() => ({ verifySpy: vi.fn() }));
@@ -12,6 +13,41 @@ vi.mock("argon2", async (importOriginal) => {
   verifySpy.mockImplementation(actual.verify);
   return { ...actual, verify: verifySpy, default: { ...actual, verify: verifySpy } };
 });
+
+/**
+ * ISS-05 — `signInAction`'s own session guard, mirroring `SCR-02-signup.test.ts`'s equivalent
+ * for `signUpAction`. Only `auth` (permissions.ts) and the action's own `signIn` call are mocked.
+ */
+vi.mock("@/server/auth", () => ({
+  auth: vi.fn(),
+  signIn: vi.fn(async (_provider: string, options: { redirectTo: string }) => {
+    throw new Refusal("redirect", options.redirectTo);
+  }),
+}));
+
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn((target: string) => {
+    throw new Refusal("redirect", target);
+  }),
+}));
+
+// `actions.ts` imports `AuthError` from the real package at module load time; the package itself
+// pulls in `next/server`, which this Vitest environment cannot resolve. The action's own
+// `error instanceof AuthError` check never runs in the guard test below, so a bare class stands in.
+vi.mock("next-auth", () => ({ AuthError: class AuthError extends Error {} }));
+
+const { auth, signIn } = await import("@/server/auth");
+const { signInAction } = await import("@/app/(auth)/logowanie/actions");
+const { emptySignInState } = await import("@/app/(auth)/logowanie/signInState");
+
+const authMock = asSessionMock(auth);
+const signInMock = vi.mocked(signIn);
+
+function form(values: Record<string, string>): FormData {
+  const data = new FormData();
+  for (const [key, value] of Object.entries(values)) data.set(key, value);
+  return data;
+}
 
 const ADMIN = { email: "Admin.Seed@example.test", password: "correct horse battery staple" };
 const LEARNER = { email: "learner@example.test", password: "another good password" };
@@ -40,6 +76,8 @@ describe("API-02 — action signIn", () => {
   beforeEach(() => {
     // A block body on purpose: returning the mock would let the runner treat it as a thenable.
     verifySpy.mockClear();
+    authMock.mockReset();
+    signInMock.mockClear();
   });
 
   it("verifies the seeded administrator and reports the role from the row (AC-03.1, DEC-42)", async () => {
@@ -88,5 +126,21 @@ describe("API-02 — action signIn", () => {
       data: { email: "broken@example.test", nickname: "broken", passwordHash: "not-a-digest" },
     });
     await expect(verifyCredentials("broken@example.test", "anything")).resolves.toBeNull();
+  });
+});
+
+describe("API-02 — action signIn, session guard (ISS-05)", () => {
+  it("redirects a signed-in User/Administrator calling the action directly, no sign-in attempt", async () => {
+    authMock.mockResolvedValue(signedInSession("USER"));
+    expect(
+      (await refusalFrom(() => signInAction(emptySignInState, form(LEARNER)))).target,
+    ).toBe("/start");
+    expect(signInMock).not.toHaveBeenCalled();
+
+    authMock.mockResolvedValue(signedInSession("ADMIN"));
+    expect(
+      (await refusalFrom(() => signInAction(emptySignInState, form(ADMIN)))).target,
+    ).toBe("/start");
+    expect(signInMock).not.toHaveBeenCalled();
   });
 });

@@ -16,11 +16,13 @@ export async function resetDatabase(): Promise<void> {
 
 let sequence = 0;
 
-export async function createUser(overrides: { nickname?: string; role?: "USER" | "ADMIN" } = {}) {
+export async function createUser(
+  overrides: { email?: string; nickname?: string; role?: "USER" | "ADMIN" } = {},
+) {
   sequence += 1;
   return db.user.create({
     data: {
-      email: `person-${sequence}@example.test`,
+      email: overrides.email ?? `person-${sequence}@example.test`,
       nickname: overrides.nickname ?? `person_${sequence}`,
       passwordHash: "not-a-real-hash",
       role: overrides.role ?? "USER",

@@ -1,4 +1,15 @@
 .agent-team/
 node_modules/
 .env
+.env*.local
 .next/
+next-env.d.ts
+/out/
+/build
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+*.tsbuildinfo
+.DS_Store

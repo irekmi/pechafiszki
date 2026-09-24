@@ -1,9 +1,11 @@
 "use server";
 
 import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { signIn } from "@/server/auth";
-import { safeReturnPath } from "@/server/routeAccess";
+import { currentUser } from "@/server/permissions";
+import { SIGNED_IN_HOME, safeReturnPath } from "@/server/routeAccess";
 import { INVALID_CREDENTIALS, emptySignInState, type SignInState } from "./signInState";
 
 /**
@@ -13,6 +15,10 @@ import { INVALID_CREDENTIALS, emptySignInState, type SignInState } from "./signI
  *
  * Only `email` and `password` are read. A `role` field submitted alongside them is not parsed here
  * and could not be used anyway: the session's role comes from the row (CLAUDE.md §8, AC-03.5).
+ *
+ * The page already redirects a signed-in visitor away from SCR-01, but a server action is a public
+ * endpoint of its own — it re-checks the session here too (CLAUDE.md §8), so calling it directly
+ * cannot re-authenticate an already-signed-in User or Administrator as someone else (ISS-05).
  */
 
 const schema = z.object({
@@ -28,6 +34,8 @@ export async function signInAction(
   _previous: SignInState,
   formData: FormData,
 ): Promise<SignInState> {
+  if (await currentUser()) redirect(SIGNED_IN_HOME);
+
   const email = field(formData.get("email"));
   const parsed = schema.safeParse({ email, password: field(formData.get("password")) });
 

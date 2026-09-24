@@ -18,6 +18,13 @@ export default defineConfig({
           name: "integration",
           environment: "node",
           include: ["tests/integration/**/*.test.{ts,tsx}"],
+          // A throwaway PostgreSQL, migrated once for the run; the tests share it, so they run
+          // in one process, one file at a time — a file may then empty the tables and count rows.
+          globalSetup: ["tests/integration/setup/database.ts"],
+          pool: "forks",
+          poolOptions: { forks: { singleFork: true } },
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
     ],

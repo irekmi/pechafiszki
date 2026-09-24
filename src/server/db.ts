@@ -24,8 +24,21 @@ function createClient(): PrismaClient {
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const db: PrismaClient = globalForPrisma.prisma ?? createClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
+function instance(): PrismaClient {
+  globalForPrisma.prisma ??= createClient();
+  return globalForPrisma.prisma;
 }
+
+/**
+ * Created on first use, not at import time. A page that merely imports something which imports
+ * `db` — as every page reading data now does, starting with SCR-04's `validateResetToken` — must
+ * not need `DATABASE_URL` just to be loaded, or `next build`'s page-data collection fails on every
+ * such route even though it never runs a query at build time (found while building ST-05).
+ * Properties are bound to the real client so Prisma's own internal `this` is never the proxy.
+ */
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const value = Reflect.get(instance(), prop);
+    return typeof value === "function" ? value.bind(instance()) : value;
+  },
+});

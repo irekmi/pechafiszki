@@ -1,0 +1,186 @@
+// Data model of pechafiszki — spec/data-model.md, ENT-01 … ENT-09.
+// ENT-08 WeeklySummary is deliberately absent: it is derived from ENT-05 on request (DEC-54).
+// All identifiers are English (CLAUDE.md §4); all timestamps are timestamptz, stored UTC, and
+// every week boundary is computed in Europe/Warsaw by the domain layer (DEC-06).
+// Field lengths (question 200, answer 1200, code example 1200, reason 500, nickname 3–24,
+// category name 40) are the Zod boundary of DEC-27, not column types.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  // citext gives the case-insensitive uniqueness of DEC-24 and DEC-44 as a column type, so it
+  // lives in this schema and cannot drift away; pg_trgm carries the search index of DEC-49/DEC-35.
+  extensions = [citext, pg_trgm]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum FlashcardStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Mark {
+  KNOW
+  REPEAT
+  UNKNOWN
+}
+
+enum Decision {
+  APPROVED
+  REJECTED
+}
+
+/// ENT-01 — a person with an account.
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique @db.Citext
+  nickname     String   @unique @db.Citext
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  flashcards   Flashcard[]
+  decisions    ModerationDecision[]
+  progress     CardProgress[]
+  reviewEvents ReviewEvent[]
+  sessions     StudySession[]
+  resetTokens  PasswordResetToken[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+/// ENT-02 — the grouping a flashcard belongs to.
+model Category {
+  id       Int    @id @default(autoincrement())
+  name     String @unique @db.Citext
+  position Int    @unique
+
+  flashcards Flashcard[]
+}
+
+/// ENT-03 — one question with its answer and optional code example.
+model Flashcard {
+  id          Int             @id @default(autoincrement())
+  categoryId  Int
+  question    String
+  answer      String
+  codeExample String?
+  status      FlashcardStatus @default(PENDING)
+  authorId    Int?
+  submittedAt DateTime        @default(now()) @db.Timestamptz(3)
+  decidedAt   DateTime?       @db.Timestamptz(3)
+
+  category     Category             @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  author       User?                @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  decisions    ModerationDecision[]
+  progress     CardProgress[]
+  reviewEvents ReviewEvent[]
+
+  @@index([status, submittedAt])
+  @@index([categoryId, status])
+  @@index([authorId, status])
+  @@index([question(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([answer(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+/// ENT-04 — the append-only record of an approval or a rejection.
+model ModerationDecision {
+  id          Int      @id @default(autoincrement())
+  flashcardId Int
+  decision    Decision
+  reason      String?
+  decidedById Int?
+  decidedAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  decidedBy User?     @relation(fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([flashcardId, decidedAt])
+  @@index([decidedAt, decision])
+}
+
+/// ENT-05 — one learner's standing on one flashcard.
+model CardProgress {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  flashcardId  Int
+  mark         Mark
+  knowCount    Int       @default(0)
+  hiddenUntil  DateTime? @db.Timestamptz(3)
+  lastSeenAt   DateTime  @default(now()) @db.Timestamptz(3)
+  firstKnownAt DateTime? @db.Timestamptz(3)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, flashcardId])
+  @@index([userId, mark])
+  @@index([userId, hiddenUntil])
+  @@index([userId, firstKnownAt])
+}
+
+/// ENT-06 — the append-only record that a marking was given.
+/// sessionId is nullable: a marking given from SCR-09 has no session (stages/audit-questions.md#aq-001,
+/// API-12). Every session-scoped count excludes rows whose sessionId is null.
+model ReviewEvent {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  flashcardId        Int
+  sessionId          Int?
+  mark               Mark
+  wasReinforcement   Boolean  @default(false)
+  countedTowardsKnow Boolean  @default(false)
+  resetFrom          Int?
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcard Flashcard     @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  session   StudySession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@index([userId, createdAt])
+  @@index([flashcardId, userId, mark])
+}
+
+/// ENT-07 — one sitting of study.
+model StudySession {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  startedAt DateTime  @default(now()) @db.Timestamptz(3)
+  endedAt   DateTime? @db.Timestamptz(3)
+  filters   Json      @default("{}")
+  queue     Json
+  cursor    Int       @default(0)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewEvents ReviewEvent[]
+
+  @@index([userId, endedAt])
+  @@index([userId, startedAt])
+}
+
+/// ENT-09 — the single-use credential behind the reset link.
+/// expiresAt is set to now + 60 minutes by the service that issues the token (DEC-46); the token
+/// itself never reaches the database, only its SHA-256 hash (CLAUDE.md §8).
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz(3)
+  usedAt    DateTime? @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

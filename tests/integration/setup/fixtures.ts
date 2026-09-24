@@ -17,14 +17,19 @@ export async function resetDatabase(): Promise<void> {
 let sequence = 0;
 
 export async function createUser(
-  overrides: { email?: string; nickname?: string; role?: "USER" | "ADMIN" } = {},
+  overrides: {
+    email?: string;
+    nickname?: string;
+    role?: "USER" | "ADMIN";
+    passwordHash?: string;
+  } = {},
 ) {
   sequence += 1;
   return db.user.create({
     data: {
       email: overrides.email ?? `person-${sequence}@example.test`,
       nickname: overrides.nickname ?? `person_${sequence}`,
-      passwordHash: "not-a-real-hash",
+      passwordHash: overrides.passwordHash ?? "not-a-real-hash",
       role: overrides.role ?? "USER",
     },
   });

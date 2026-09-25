@@ -42,7 +42,10 @@ export function PageActions({ children }: { children: ReactNode }) {
   );
 }
 
-/** `.stack` — the vertical rhythm every screen composes its sections with. */
+/**
+ * `.stack` — the vertical rhythm every screen composes its sections with. `*:min-w-0` is the
+ * mockup's `.stack > *` rule: a wide child must not stretch the grid column past the page.
+ */
 export function Stack({
   size = "md",
   className,
@@ -53,7 +56,7 @@ export function Stack({
   children: ReactNode;
 }) {
   const gap = size === "sm" ? "gap-3" : size === "lg" ? "gap-8" : "gap-gap";
-  return <div className={cn("grid", gap, className)}>{children}</div>;
+  return <div className={cn("grid *:min-w-0", gap, className)}>{children}</div>;
 }
 
 /**
@@ -71,7 +74,7 @@ export function Grid({
   children: ReactNode;
 }) {
   const columns = cols === 2 ? "grid-cols-1 md:grid-cols-aside" : "grid-cols-2 md:grid-cols-4";
-  return <div className={cn("grid gap-4", columns, className)}>{children}</div>;
+  return <div className={cn("grid gap-4 *:min-w-0", columns, className)}>{children}</div>;
 }
 
 /** `.row` and `.row--between` */

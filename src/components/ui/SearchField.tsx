@@ -1,6 +1,6 @@
-import { SearchIcon } from "@/components/ui/icons";
-import { Input } from "@/components/ui/Input";
-import { FilterItem, FilterLabel } from "@/components/ui/FilterBar";
+import { SearchIcon } from "./icons";
+import { Input } from "./Input";
+import { FilterItem, FilterLabel } from "./FilterBar";
 
 type SearchFieldProps = { value: string; onChange: (value: string) => void };
 

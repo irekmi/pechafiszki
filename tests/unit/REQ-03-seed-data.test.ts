@@ -6,7 +6,7 @@ import {
   seedCardSchema,
 } from "../../prisma/seedData";
 
-// REQ-03, DEC-21, DEC-22, DEC-27 — the content extracted from the legacy index.html, checked
+// REQ-03, DEC-21, DEC-22, DEC-27 — the content carried over from the retired legacy PWA, checked
 // without a database: the counts, the nine categories, and the limits that stop the seed.
 
 describe("seed data (REQ-03)", () => {

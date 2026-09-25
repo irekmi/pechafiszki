@@ -57,6 +57,25 @@ export function refuseNotFound(): never {
   notFound();
 }
 
+type AccessCard = { status: "PENDING" | "APPROVED" | "REJECTED"; authorId: number | null };
+type Actor = Pick<SessionUser, "id" | "role">;
+
+/**
+ * Object rule on ENT-03, reading: approved is readable by any signed-in person, pending or rejected
+ * only by its author and an Administrator. False ends in `refuseNotFound()`, as a missing row does.
+ */
+export function canReadFlashcard(user: Actor, card: AccessCard): boolean {
+  return card.status === "APPROVED" || card.authorId === user.id || user.role === "ADMIN";
+}
+
+/** Editing: an Administrator any card; the author their own while it is not approved. */
+export function canEditFlashcard(user: Actor, card: AccessCard): boolean {
+  return user.role === "ADMIN" || (card.authorId === user.id && card.status !== "APPROVED");
+}
+
+/** Deleting from SCR-09 is the Administrator's alone (API-23). */
+export const canDeleteFlashcard = (user: Pick<Actor, "role">): boolean => user.role === "ADMIN";
+
 /**
  * `src/middleware.ts` puts the requested address on the request, so a guard that fires after it —
  * or instead of it — can still send the caller back where they were going (AC-03.3). Without the

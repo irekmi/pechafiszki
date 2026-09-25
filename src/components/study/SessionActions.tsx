@@ -2,14 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { shuffleSessionAction } from "@/server/actions/shuffleSession";
+import { FinishSessionButton } from "./FinishSessionButton";
 import { ResetFiltersButton } from "./ResetFiltersButton";
 import { useStudy } from "./StudyShell";
 
 /**
  * The foot of the navigation card: **Przetasuj** (API-14, DEC-16), **Zacznij od nowa** and
- * **Zakończ sesję**. Until ST-09 builds the summary, **Zakończ sesję** returns to SCR-05.
+ * **Zakończ sesję** (API-13, opens SCR-07).
  */
 export function SessionActions({ sessionId }: { sessionId: number }) {
   const [pending, startTransition] = useTransition();
@@ -30,9 +31,7 @@ export function SessionActions({ sessionId }: { sessionId: number }) {
         Przetasuj
       </Button>
       <ResetFiltersButton size="sm" />
-      <ButtonLink size="sm" href="/start">
-        Zakończ sesję
-      </ButtonLink>
+      <FinishSessionButton sessionId={sessionId} />
     </>
   );
 }

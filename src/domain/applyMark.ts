@@ -1,10 +1,11 @@
 import type { Mark, MarkOutcome, ProgressRecord } from "./types";
 
-const HIDE_DAYS = 7;
-const KNOW_THRESHOLD = 5;
+/** DEC-05: a card is hidden for seven days once it reaches five consecutive **Umiem**. */
+export const HIDE_DAYS = 7;
+export const KNOW_THRESHOLD = 5;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-function addDays(date: Date, days: number): Date {
+export function addDays(date: Date, days: number): Date {
   return new Date(date.getTime() + days * MS_PER_DAY);
 }
 

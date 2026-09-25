@@ -15,10 +15,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
   const pendingQueue = user.role === "ADMIN" ? await getPendingQueueCount() : undefined;
   const onStudy = (await headers()).get("x-pathname") === "/nauka";
-  const studying = onStudy && ((await findOpenSession(user.id))?.queue.length ?? 0) > 0;
+  const open = onStudy ? await findOpenSession(user.id) : null;
+  const studyingSessionId = open && open.queue.length > 0 ? open.id : undefined;
   return (
     <>
-      <TopBar user={user} pendingQueue={pendingQueue} studying={studying} />
+      <TopBar user={user} pendingQueue={pendingQueue} studyingSessionId={studyingSessionId} />
       {children}
     </>
   );

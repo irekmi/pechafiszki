@@ -3,18 +3,19 @@ import { CategoryList } from "@/components/start/CategoryList";
 import { CounterTiles } from "@/components/start/CounterTiles";
 import { SubmissionsCard } from "@/components/start/SubmissionsCard";
 import { WeeklyCard } from "@/components/start/WeeklyCard";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Grid, Page, PageActions, PageHead, PageTitleGroup, Stack } from "@/components/ui/Page";
 import { Muted, PageTitle } from "@/components/ui/Typography";
+import { startSessionAction } from "@/server/actions/startSession";
 import { requireUser } from "@/server/permissions";
 import { getHomeSummary } from "@/server/services/getHomeSummary";
 
 /**
- * SCR-05 — the landing screen after signing in (API-08). **Zacznij naukę**, a category's **Ucz się**
- * and the counter tiles all point at their real addresses already; only the screens behind those
- * addresses (SCR-06, SCR-08, …) are built in later stages (see the stage file's "Explicitly NOT in
- * this stage" table) — this page wires and composes, it does not shape any of API-08's figures.
+ * SCR-05 — the landing screen after signing in (API-08). **Zacznij naukę** and a category's
+ * **Ucz się** post to `startSessionAction` (API-10, ST-08); the counter tiles point at their real
+ * addresses, the screens behind which (SCR-08, …) are built in later stages. This page wires and
+ * composes, it does not shape any of API-08's figures.
  */
 export default async function StartPage() {
   const user = await requireUser();
@@ -43,9 +44,11 @@ export default async function StartPage() {
           </Muted>
         </PageTitleGroup>
         <PageActions>
-          <ButtonLink href="/nauka" variant="primary" size="lg">
-            Zacznij naukę
-          </ButtonLink>
+          <form action={startSessionAction}>
+            <Button type="submit" variant="primary" size="lg">
+              Zacznij naukę
+            </Button>
+          </form>
         </PageActions>
       </PageHead>
 

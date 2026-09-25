@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { cn } from "./cn";
 
 type ListItemProps = {
-  href: string;
+  /** A row is a link, or — without `href` — a submit button of the form it sits in (SCR-05's **Ucz się**). */
+  href?: string;
   leading?: ReactNode;
   title: ReactNode;
   meta?: ReactNode;
@@ -14,15 +15,14 @@ type ListItemProps = {
 
 /** `.list-item` — one row of the flashcard lists on SCR-08, SCR-11 and SCR-16. */
 export function ListItem({ href, leading, title, meta, side, note, className }: ListItemProps) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-4 px-5 py-4 bg-surface border-2 border-ink rounded-md",
-        "shadow-hard hover:shadow-hard-lg no-underline text-ink",
-        className,
-      )}
-    >
+  const classes = cn(
+    "flex items-center gap-4 px-5 py-4 bg-surface border-2 border-ink rounded-md",
+    "shadow-hard hover:shadow-hard-lg no-underline text-ink",
+    !href && "w-full text-left font-sans cursor-pointer",
+    className,
+  );
+  const body = (
+    <>
       {leading ? (
         <span className="shrink-0 w-auto md:w-42 flex justify-center">{leading}</span>
       ) : null}
@@ -38,7 +38,16 @@ export function ListItem({ href, leading, title, meta, side, note, className }: 
         ) : null}
       </span>
       {side ? <span className="flex gap-2 items-center shrink-0">{side}</span> : null}
+    </>
+  );
+  return href ? (
+    <Link href={href} className={classes}>
+      {body}
     </Link>
+  ) : (
+    <button type="submit" className={classes}>
+      {body}
+    </button>
   );
 }
 

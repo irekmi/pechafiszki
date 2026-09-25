@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import type { SessionUser } from "@/server/permissions";
-import { ButtonLink } from "@/components/ui/Button";
+import { FinishSessionButton } from "@/components/study/FinishSessionButton";
 import { TopBarNav, type NavLink } from "./TopBarNav";
 
 const BASE_LINKS: NavLink[] = [
@@ -12,18 +12,19 @@ const BASE_LINKS: NavLink[] = [
   { href: "/statystyki", label: "Statystyki" },
 ];
 
-type TopBarProps = { user: SessionUser; pendingQueue?: number; studying?: boolean };
+type TopBarProps = { user: SessionUser; pendingQueue?: number; studyingSessionId?: number };
 
 /**
  * SCR-05 element 1, shared by every `(app)`/`(admin)` screen. The **Administracja** item and its
  * badge exist in this array only for an administrator (NFR-01) — never rendered and then hidden, so
- * a User's HTML never carries it (AC-07.3). `studying` adds **Zakończ sesję** on SCR-06 (until
- * ST-09 builds SCR-07 it returns to SCR-05).
+ * a User's HTML never carries it (AC-07.3). `studyingSessionId` adds **Zakończ sesję** on
+ * SCR-06, which closes that session and opens SCR-07 (API-13).
  */
-export async function TopBar({ user, pendingQueue, studying }: TopBarProps) {
+export async function TopBar({ user, pendingQueue, studyingSessionId }: TopBarProps) {
   const pathname = (await headers()).get("x-pathname") ?? "";
-  // The mockups mark **Fiszki** active on the study session: SCR-06 is entered from the library.
-  const navPath = pathname === "/nauka" ? "/fiszki" : pathname;
+  // The mockups mark **Fiszki** active on the study session and its summary (SCR-06, SCR-07).
+  const studyScreen = pathname === "/nauka" || pathname.startsWith("/podsumowanie/");
+  const navPath = studyScreen ? "/fiszki" : pathname;
   const links: NavLink[] =
     user.role === "ADMIN"
       ? [...BASE_LINKS, { href: "/administracja", label: "Administracja", badge: pendingQueue ?? 0 }]
@@ -44,11 +45,7 @@ export async function TopBar({ user, pendingQueue, studying }: TopBarProps) {
         </Link>
         <TopBarNav links={links} pathname={navPath} />
         <div className="flex items-center gap-3">
-          {studying ? (
-            <ButtonLink size="sm" href="/start">
-              Zakończ sesję
-            </ButtonLink>
-          ) : null}
+          {studyingSessionId ? <FinishSessionButton sessionId={studyingSessionId} /> : null}
           <Link
             href="/profil"
             className="flex items-center gap-2.5 pl-1 pr-3 py-1 border border-white/20 rounded-pill text-on-brand no-underline text-14 font-medium hover:text-white hover:border-gold"

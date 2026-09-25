@@ -11,7 +11,7 @@ export type StudyCard = {
 
 export type SessionQueueResult =
   | { status: "none" }
-  | { status: "finished" }
+  | { status: "finished"; sessionId: number }
   | {
       status: "empty";
       kind: "no-results" | "all-hidden";

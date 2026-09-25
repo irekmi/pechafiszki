@@ -11,7 +11,7 @@ import { queueToJson } from "./sessionFilters";
  * the lookup is by the caller's id. A card deleted (or no longer approved) since the queue was built
  * is dropped from the stored queue and the total adjusts, with no error (DEC-59). `cursorParam`
  * moves the cursor (Poprzednia / Następna / swipe); the resulting cursor is persisted so a reload
- * resumes in place (DEC-12). A cursor past the last card is `finished` — ST-09 closes the session.
+ * resumes in place (DEC-12). A cursor past the last card is `finished` — SCR-06 sends it to SCR-07, which closes it.
  */
 export async function getSessionQueue(
   userId: number,
@@ -45,7 +45,7 @@ export async function getSessionQueue(
     return { status: "empty", kind, filters: session.filters, returnDate };
   }
   const entry = queue[cursor];
-  if (!entry) return { status: "finished" };
+  if (!entry) return { status: "finished", sessionId: session.id };
 
   const row = live.get(entry.flashcardId)!;
   const progress = row.progress[0];

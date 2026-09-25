@@ -167,7 +167,7 @@ describe("SCR-06 API-11 — the loader (AC-08.12, scenario 4)", () => {
     const session = await createSession(user.id, [a!.id, b!.id]);
     expect(await getSessionQueue(user.id, 1)).toMatchObject({ status: "ok", position: 2 });
     expect((await db.studySession.findUniqueOrThrow({ where: { id: session.id } })).cursor).toBe(1);
-    expect(await getSessionQueue(user.id, 2)).toEqual({ status: "finished" });
+    expect(await getSessionQueue(user.id, 2)).toEqual({ status: "finished", sessionId: session.id });
   });
 
   it("returns none when the caller has no open session", async () => {

@@ -1,19 +1,8 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { NoResultsArt } from "@/components/ui/EmptyArt";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { SessionFilters } from "@/server/services/sessionFilters";
 import { ResetFiltersButton } from "./ResetFiltersButton";
-
-/** The mockup's magnifier over two cards, drawn with theme colours (the mockup's oklch literals are stale). */
-function NoResultsArt() {
-  return (
-    <svg viewBox="0 0 132 92" aria-hidden="true" className="block w-full h-full">
-      <rect x="14" y="16" width="80" height="58" rx="10" fill="none" stroke="currentColor" strokeOpacity="0.22" strokeWidth="2" />
-      <rect x="38" y="28" width="80" height="58" rx="10" className="fill-surface-2 stroke-surface-3" strokeWidth="2" />
-      <circle cx="72" cy="52" r="13" fill="none" className="stroke-brand" strokeWidth="2.4" />
-      <path d="M82 62l12 12" className="stroke-brand" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 function describe(filters: SessionFilters, categoryName: string | null): string {
   const query = filters.query ? `zapytaniu „${filters.query}”` : null;

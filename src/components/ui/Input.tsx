@@ -16,7 +16,13 @@ export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputEleme
 }
 
 export function Select({ className, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={cn(FIELD_CLASS, "appearance-none pr-9.5 cursor-pointer", className)} {...rest} />;
+  // A <select> always matches `:read-only`, so the read-only tint of FIELD_CLASS is undone here.
+  return (
+    <select
+      className={cn(FIELD_CLASS, "appearance-none pr-9.5 cursor-pointer read-only:bg-surface read-only:text-ink", className)}
+      {...rest}
+    />
+  );
 }
 
 export function Textarea({

@@ -71,7 +71,7 @@ export function Button({ variant, size, block, className, type, ...rest }: Butto
 }
 
 type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> &
-  ButtonLook & { href: string; children: ReactNode };
+  ButtonLook & { href: string; scroll?: boolean; children: ReactNode };
 
 export function ButtonLink({ variant, size, block, className, href, ...rest }: ButtonLinkProps) {
   return (

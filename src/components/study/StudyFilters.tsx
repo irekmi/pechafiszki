@@ -8,7 +8,7 @@ import { applySessionFiltersAction } from "@/server/actions/applySessionFilters"
 import type { CategoryRow } from "@/server/services/listCategories";
 import type { SessionFilters } from "@/server/services/sessionFilters";
 import { FilterChips } from "./FilterChips";
-import { SearchField } from "./SearchField";
+import { SearchField } from "@/components/ui/SearchField";
 
 type StudyFiltersProps = {
   categories: CategoryRow[];

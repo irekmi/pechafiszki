@@ -19,6 +19,17 @@ export function AlertIcon() {
   );
 }
 
+/** `.topbar__burger`'s icon, drawn on every signed-in screen below 768 px. */
+export function BurgerIcon() {
+  return (
+    <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
+      <rect y="0" width="18" height="2" rx="1" fill="currentColor" />
+      <rect y="5" width="18" height="2" rx="1" fill="currentColor" />
+      <rect y="10" width="18" height="2" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
 /** `.notice__icon` as drawn in `03-reset-hasla.html`'s success notice. */
 export function CheckIcon() {
   return (

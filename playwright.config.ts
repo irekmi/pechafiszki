@@ -13,7 +13,10 @@ export default defineConfig({
   use: { baseURL: BASE_URL, trace: "on-first-retry", viewport: { width: 1440, height: 900 } },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `npm run start -- --port ${PORT}`,
+    // `withDb.ts` boots a throwaway PostgreSQL, migrates and seeds it, then runs this command —
+    // NFR-03's flows need real writes, from ST-07's rejestracja → logowanie → start onward. See its
+    // own comment for why this cannot be Playwright's own `globalSetup` instead.
+    command: `node_modules/.bin/tsx tests/e2e/setup/withDb.ts npm run start -- --port ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

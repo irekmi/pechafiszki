@@ -39,7 +39,11 @@ export async function createCategory(name: string, position: number) {
   return db.category.create({ data: { name, position } });
 }
 
-export async function createFlashcard(categoryId: number, authorId: number | null) {
+export async function createFlashcard(
+  categoryId: number,
+  authorId: number | null,
+  status: "PENDING" | "APPROVED" | "REJECTED" = "APPROVED",
+) {
   sequence += 1;
   return db.flashcard.create({
     data: {
@@ -47,7 +51,22 @@ export async function createFlashcard(categoryId: number, authorId: number | nul
       authorId,
       question: `Pytanie ${sequence}?`,
       answer: `Odpowiedź ${sequence}.`,
-      status: "APPROVED",
+      status,
+    },
+  });
+}
+
+export async function createProgress(
+  userId: number,
+  flashcardId: number,
+  overrides: { mark?: "KNOW" | "REPEAT" | "UNKNOWN"; firstKnownAt?: Date } = {},
+) {
+  return db.cardProgress.create({
+    data: {
+      userId,
+      flashcardId,
+      mark: overrides.mark ?? "KNOW",
+      firstKnownAt: overrides.firstKnownAt ?? null,
     },
   });
 }

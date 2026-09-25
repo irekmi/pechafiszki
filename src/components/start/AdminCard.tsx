@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
-import { Card, CardFoot, CardHead } from "@/components/ui/Card";
+import { Card, CardFoot, CardHead, CardTitle } from "@/components/ui/Card";
 import { Muted } from "@/components/ui/Typography";
 
 /**
@@ -11,7 +11,7 @@ export function AdminCard({ pendingQueue }: { pendingQueue: number }) {
   return (
     <Card tint>
       <CardHead>
-        <h2 className="font-display font-bold text-16 leading-title">Administracja</h2>
+        <CardTitle>Administracja</CardTitle>
         <Badge tone="admin">Administrator</Badge>
       </CardHead>
       <Muted>

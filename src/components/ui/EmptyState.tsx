@@ -20,7 +20,7 @@ export function EmptyState({ title, text, art, actions, inline, className }: Emp
         className,
       )}
     >
-      {art ? <span className="w-33 h-23 text-ink-3">{art}</span> : null}
+      {art ? <span className="w-33 h-23 text-ink">{art}</span> : null}
       <h2 className="font-display font-bold text-24 leading-flat text-brand">{title}</h2>
       {text ? <p className="text-ink-2 max-w-105">{text}</p> : null}
       {actions ? <EmptyActions>{actions}</EmptyActions> : null}

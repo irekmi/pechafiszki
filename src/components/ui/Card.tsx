@@ -37,3 +37,8 @@ export function CardFoot({ className, children }: { className?: string; children
     <div className={cn("mt-4.5 pt-3.5 border-t border-line", className)}>{children}</div>
   );
 }
+
+/** `.card__head h2` — the title inside a card's head. */
+export function CardTitle({ className, children }: { className?: string; children: ReactNode }) {
+  return <h2 className={cn("font-display font-bold text-16 leading-title", className)}>{children}</h2>;
+}

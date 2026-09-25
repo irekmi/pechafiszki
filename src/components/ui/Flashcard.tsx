@@ -18,6 +18,11 @@ type FlashcardProps = {
   /** `.flashcard--static` — no flip, used where the answer is always shown. */
   variant?: "flip" | "static" | "preview";
   defaultRevealed?: boolean;
+  /** Controlled flip: SCR-06's **Pokaż / ukryj** lives outside the card and shares this state. */
+  revealed?: boolean;
+  onToggle?: () => void;
+  /** SCR-06 draws the question as its page's `h1`; elsewhere it is an `h2`. */
+  heading?: "h1" | "h2";
   className?: string;
 };
 
@@ -29,15 +34,20 @@ export function Flashcard({
   badges,
   variant = "flip",
   defaultRevealed = false,
+  revealed: controlledRevealed,
+  onToggle,
+  heading: Heading = "h2",
   className,
 }: FlashcardProps) {
-  const [revealed, setRevealed] = useState(defaultRevealed || variant !== "flip");
+  const [ownRevealed, setOwnRevealed] = useState(defaultRevealed || variant !== "flip");
+  const revealed = controlledRevealed ?? ownRevealed;
+  const toggle = onToggle ?? (() => setOwnRevealed((value) => !value));
   const preview = variant === "preview";
   const flippable = variant === "flip";
 
   return (
     <article
-      onClick={flippable ? () => setRevealed((value) => !value) : undefined}
+      onClick={flippable ? toggle : undefined}
       className={cn(
         "bg-surface border-ink rounded-lg grid gap-5 content-start",
         preview
@@ -49,7 +59,7 @@ export function Flashcard({
       )}
     >
       {badges ? <div className="flex justify-between gap-3 items-center">{badges}</div> : null}
-      <h2 className={cn(QUESTION_CLASS, preview && "text-20 md:text-20")}>{question}</h2>
+      <Heading className={cn(QUESTION_CLASS, Heading === "h1" && "text-brand", preview && "text-20 md:text-20")}>{question}</Heading>
       {flippable ? (
         <p className="flex items-center gap-2 text-13 text-ink-3">
           {revealed ? HINT_HIDE : HINT_SHOW}

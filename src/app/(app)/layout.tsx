@@ -1,7 +1,9 @@
+import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import { TopBar } from "@/components/shell/TopBar";
 import { requireUser } from "@/server/permissions";
 import { getPendingQueueCount } from "@/server/services/getPendingQueueCount";
+import { findOpenSession } from "@/server/services/openSession";
 
 /**
  * The guard every signed-in screen sits behind (NFR-01), plus the shared top bar (SCR-05 element 1,
@@ -12,9 +14,11 @@ import { getPendingQueueCount } from "@/server/services/getPendingQueueCount";
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
   const pendingQueue = user.role === "ADMIN" ? await getPendingQueueCount() : undefined;
+  const onStudy = (await headers()).get("x-pathname") === "/nauka";
+  const studying = onStudy && ((await findOpenSession(user.id))?.queue.length ?? 0) > 0;
   return (
     <>
-      <TopBar user={user} pendingQueue={pendingQueue} />
+      <TopBar user={user} pendingQueue={pendingQueue} studying={studying} />
       {children}
     </>
   );

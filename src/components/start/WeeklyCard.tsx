@@ -1,4 +1,4 @@
-import { Card, CardFoot, CardHead } from "@/components/ui/Card";
+import { Card, CardFoot, CardHead, CardTitle } from "@/components/ui/Card";
 import { Hint } from "@/components/ui/Typography";
 import { Progress, ProgressMeta } from "@/components/ui/Progress";
 import type { HomeSummary } from "@/server/services/getHomeSummary";
@@ -9,7 +9,7 @@ export function WeeklyCard({ summary }: { summary: HomeSummary }) {
   return (
     <Card>
       <CardHead>
-        <h2 className="font-display font-bold text-16 leading-title">Zapamiętane w tym tygodniu</h2>
+        <CardTitle>Zapamiętane w tym tygodniu</CardTitle>
       </CardHead>
       <p className="font-display font-bold text-40 leading-none text-ink">{summary.memorisedThisWeek}</p>
       <Hint>{formatWeekHint(summary.weekStart, summary.weekEnd)}</Hint>

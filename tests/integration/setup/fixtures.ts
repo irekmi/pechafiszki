@@ -59,7 +59,13 @@ export async function createFlashcard(
 export async function createProgress(
   userId: number,
   flashcardId: number,
-  overrides: { mark?: "KNOW" | "REPEAT" | "UNKNOWN"; firstKnownAt?: Date } = {},
+  overrides: {
+    mark?: "KNOW" | "REPEAT" | "UNKNOWN";
+    firstKnownAt?: Date;
+    knowCount?: number;
+    hiddenUntil?: Date;
+    lastSeenAt?: Date;
+  } = {},
 ) {
   return db.cardProgress.create({
     data: {
@@ -67,6 +73,28 @@ export async function createProgress(
       flashcardId,
       mark: overrides.mark ?? "KNOW",
       firstKnownAt: overrides.firstKnownAt ?? null,
+      knowCount: overrides.knowCount ?? 0,
+      hiddenUntil: overrides.hiddenUntil ?? null,
+      ...(overrides.lastSeenAt ? { lastSeenAt: overrides.lastSeenAt } : {}),
+    },
+  });
+}
+
+/** An open study session with a hand-written queue — for tests that need an exact queue. */
+export async function createSession(
+  userId: number,
+  flashcardIds: number[],
+  options: { cursor?: number; reinforcement?: number[]; endedAt?: Date } = {},
+) {
+  return db.studySession.create({
+    data: {
+      userId,
+      cursor: options.cursor ?? 0,
+      endedAt: options.endedAt ?? null,
+      queue: flashcardIds.map((flashcardId) => ({
+        flashcardId,
+        isReinforcement: options.reinforcement?.includes(flashcardId) ?? false,
+      })),
     },
   });
 }

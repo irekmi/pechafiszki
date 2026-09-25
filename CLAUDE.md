@@ -272,8 +272,7 @@ that has been applied.
 
 ## 12. Seed data
 
-`prisma/seed.ts` seeds the nine categories and the **220 flashcards that already exist in the legacy
-[index.html](index.html)** — the `const C = [...]` array, whose objects map straight across:
+`prisma/seed.ts` seeds the nine categories and the **220 flashcards that existed in the legacy single-file PWA** — the `const C = [...]` array, whose objects map straight across:
 `c` → category, `q` → question, `a` → answer, `ex` → code example. They are seeded as Approved,
 authored by a seeded administrator account. Categories: PHP, Symfony, Doctrine/SQL, API/HTTP,
 Security, Testy, React, TypeScript, Architektura.
@@ -282,14 +281,7 @@ The seed is the starting content of the pool. Do not start from an empty databas
 flashcards.
 
 ---
-
 ## 13. The legacy PWA
 
-[index.html](index.html), [sw.js](sw.js), [manifest.webmanifest](manifest.webmanifest),
-[icon.svg](icon.svg) and [README.md](README.md) are the current single-file PWA on GitHub Pages. The
-new application replaces it, but:
-
-- it stays untouched until the new application covers E-05 and E-06;
-- it is then removed in **one** stage that names the removal explicitly — no unrelated stage deletes
-  part of it;
-- its flashcard content must already be in `prisma/seed.ts` (§12) before anything is deleted.
+The single-file PWA that preceded this application was removed in stage 10 (`retire-legacy-pwa`).
+Its flashcard content lives in `prisma/seed.ts` (§12).

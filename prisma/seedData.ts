@@ -3,7 +3,7 @@ import { z } from "zod";
 
 /**
  * The content of the seeded pool (REQ-03, DEC-21): the nine legacy categories and the 220 legacy
- * flashcards, extracted from index.html by prisma/extract-legacy-cards.mjs into seed-data.json.
+ * flashcards, kept in seed-data.json (transcribed from the retired single-file PWA).
  * Every value is checked against the DEC-27 limits here, before the seed writes anything.
  */
 

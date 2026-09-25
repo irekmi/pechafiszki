@@ -123,6 +123,9 @@
   --spacing-page: 1152px;
   --container-narrow: 760px;
   --spacing-press: 3px;
+
+  /* `.grid-2`'s literal column split (styles.css) — the main/aside layout of SCR-05, SCR-13, … */
+  --grid-template-columns-aside: minmax(0, 1.4fr) minmax(0, 1fr);
 }
 
 /* The flashcard's dashed divider is a gradient, so it cannot be a token on its own utility. */

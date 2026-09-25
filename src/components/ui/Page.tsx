@@ -56,6 +56,24 @@ export function Stack({
   return <div className={cn("grid", gap, className)}>{children}</div>;
 }
 
+/**
+ * `.grid-2` / `.grid-4` — collapses to a single column (or two, for `cols={4}`) below 768 px, the
+ * one breakpoint CLAUDE.md §3 fixes; the mockup's separate 1080 px step is folded into this same one
+ * (ISS-01), which loses nothing AC-07.8 checks (1280 px and 400 px, both outside that range).
+ */
+export function Grid({
+  cols,
+  className,
+  children,
+}: {
+  cols: 2 | 4;
+  className?: string;
+  children: ReactNode;
+}) {
+  const columns = cols === 2 ? "grid-cols-1 md:grid-cols-aside" : "grid-cols-2 md:grid-cols-4";
+  return <div className={cn("grid gap-4", columns, className)}>{children}</div>;
+}
+
 /** `.row` and `.row--between` */
 export function Row({
   between,

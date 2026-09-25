@@ -3,6 +3,7 @@ import { applyMark } from "@/domain/applyMark";
 import { expireHide, isHidden } from "@/domain/hide";
 import type { Mark, ProgressRecord } from "@/domain/types";
 import { db } from "@/server/db";
+import { canReadFlashcard } from "@/server/permissions";
 import { findOpenSession } from "./openSession";
 import { wasKnowCounted } from "./wasKnowCounted";
 
@@ -45,8 +46,7 @@ export async function markCard(
       },
     });
     if (session && card?.status !== "APPROVED") return { status: "skipped" };
-    const readable = card && (card.status === "APPROVED" || card.authorId === user.id || user.role === "ADMIN");
-    if (!card || !readable) return { status: "forbidden" };
+    if (!card || !canReadFlashcard(user, card)) return { status: "forbidden" };
 
     const row = card.progress[0];
     const current = row ? expireHide(row, now) : NEVER_MARKED;

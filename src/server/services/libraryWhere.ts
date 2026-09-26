@@ -29,19 +29,22 @@ function escapeLike(text: string): string {
   return text.replace(/[\\%_]/g, (char) => `\\${char}`);
 }
 
+/**
+ * DEC-49: the phrase is folded by the domain function, the columns by `fold_text` — the expression the
+ * two GIN trigram indexes of the library_search_fold migration are built on. Alias `f` is Flashcard;
+ * the phrase is a bound parameter with its `LIKE` metacharacters escaped (ISS-12).
+ */
+export function foldedSearch(query: string): Prisma.Sql {
+  const pattern = `%${escapeLike(foldText(query))}%`;
+  return Prisma.sql`(fold_text(f."question") LIKE ${pattern} OR fold_text(f."answer") LIKE ${pattern})`;
+}
+
 /** The WHERE of the list and of its count: approved only (REQ-01), then each filter that is set. */
 export function libraryWhere(params: LibraryParams, now: Date): Prisma.Sql {
   const parts = [Prisma.sql`f."status" = 'APPROVED'::"FlashcardStatus"`];
   if (params.category) parts.push(Prisma.sql`f."categoryId" = ${params.category}`);
   if (params.mark) parts.push(Prisma.sql`${effectiveMark(now)} = ${params.mark}`);
-  if (params.query) {
-    // DEC-49: the phrase is folded by the domain function, the columns by `fold_text` — the
-    // expression the two GIN trigram indexes of the library_search_fold migration are built on.
-    const pattern = `%${escapeLike(foldText(params.query))}%`;
-    parts.push(
-      Prisma.sql`(fold_text(f."question") LIKE ${pattern} OR fold_text(f."answer") LIKE ${pattern})`,
-    );
-  }
+  if (params.query) parts.push(foldedSearch(params.query));
   return Prisma.join(parts, " AND ");
 }
 

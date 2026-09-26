@@ -320,7 +320,7 @@ describe("API-23 deleteFlashcard (AC-16.8, AC-16.10, DEC-37)", () => {
         await db.reviewEvent.create({ data: { userId: learner.id, flashcardId: card.id, mark: "KNOW" } });
       }
       await db.moderationDecision.create({ data: { flashcardId: card.id, decision: "APPROVED", decidedById: admin.id } });
-      expect(await refusalFrom(() => deleteFlashcardAction({ id: card.id }))).toMatchObject({ kind: "redirect", target: "/administracja/oczekujace" });
+      expect(await refusalFrom(() => deleteFlashcardAction({ id: card.id }))).toMatchObject({ kind: "redirect", target: "/administracja/fiszki" });
       expect(await cardOf(card.id)).toBeNull();
       expect(await db.cardProgress.count({ where: { flashcardId: card.id } })).toBe(0);
       expect(await db.reviewEvent.count({ where: { flashcardId: card.id } })).toBe(0);

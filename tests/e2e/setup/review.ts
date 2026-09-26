@@ -57,3 +57,22 @@ export async function openReview(admin: Page, question: string): Promise<void> {
     Object.keys(document.querySelector("#category") ?? {}).some((key) => key.startsWith("__reactProps")),
   );
 }
+
+/** SCR-17's **Odrzuć** with a reason, for the card with this question; waits until the page has moved on. */
+export async function reject(admin: Page, question: string, reason: string): Promise<void> {
+  await openReview(admin, question);
+  await admin.getByRole("button", { name: "Odrzuć", exact: true }).click();
+  const dialog = admin.getByRole("dialog", { name: "Odrzuć fiszkę" });
+  await dialog.getByLabel("Powód odrzucenia").fill(reason);
+  const url = admin.url();
+  await dialog.getByRole("button", { name: "Odrzuć fiszkę" }).click();
+  await expect(admin).not.toHaveURL(url);
+}
+
+/** SCR-17's **Zatwierdź** for the card with this question; waits until the page has moved on. */
+export async function approve(admin: Page, question: string): Promise<void> {
+  await openReview(admin, question);
+  const url = admin.url();
+  await admin.getByRole("button", { name: "Zatwierdź" }).click();
+  await expect(admin).not.toHaveURL(url);
+}

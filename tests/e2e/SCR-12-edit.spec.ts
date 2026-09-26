@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { adminPage, openReview, register, stamp, submitCard } from "./setup/review";
+import { adminPage, approve, register, reject, stamp, submitCard } from "./setup/review";
 
 /**
  * SCR-12, SCR-09 and SCR-11 — edit and delete a flashcard (AC-16.1 - 16.9). Real registration, real
@@ -26,23 +26,6 @@ async function openForm(page: Page, href: string): Promise<void> {
   await page.waitForFunction(() =>
     Object.keys(document.querySelector("#category") ?? {}).some((key) => key.startsWith("__reactProps")),
   );
-}
-
-async function reject(admin: Page, question: string, reason: string): Promise<void> {
-  await openReview(admin, question);
-  await admin.getByRole("button", { name: "Odrzuć", exact: true }).click();
-  const dialog = admin.getByRole("dialog", { name: "Odrzuć fiszkę" });
-  await dialog.getByLabel("Powód odrzucenia").fill(reason);
-  const url = admin.url();
-  await dialog.getByRole("button", { name: "Odrzuć fiszkę" }).click();
-  await expect(admin).not.toHaveURL(url);
-}
-
-async function approve(admin: Page, question: string): Promise<void> {
-  await openReview(admin, question);
-  const url = admin.url();
-  await admin.getByRole("button", { name: "Zatwierdź" }).click();
-  await expect(admin).not.toHaveURL(url);
 }
 
 test.describe("SCR-12 — correct and resubmit, then approve from the form", () => {
@@ -212,7 +195,7 @@ test.describe("delete (AC-16.7, AC-16.8, AC-16.9)", () => {
     const dialog = admin.getByRole("dialog", { name: "Usunąć tę fiszkę na stałe?" });
     await expect(dialog).toContainText("Uczący się stracą swój postęp na tej fiszce.");
     await dialog.getByRole("button", { name: "Usuń fiszkę" }).click();
-    await expect(admin).toHaveURL(/\/administracja\/oczekujace$/);
+    await expect(admin).toHaveURL(/\/administracja\/fiszki$/);
 
     await page.goto(`/fiszki?query=${encodeURIComponent(question)}`);
     await expect(page.getByRole("link", { name: question })).toHaveCount(0);

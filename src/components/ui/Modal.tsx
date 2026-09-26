@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "./cn";
 
 type ModalProps = {
@@ -13,7 +14,10 @@ type ModalProps = {
   children?: ReactNode;
 };
 
-/** `.modal-backdrop` + `.modal`, with the backdrop click and Escape the mockups imply. */
+/**
+ * `.modal-backdrop` + `.modal`, with the backdrop click and Escape the mockups imply. Portalled to `body`,
+ * as in the mockup, so the dialog never inherits the type size or wrapping of the table cell it opens from.
+ */
 export function Modal({ open, onClose, title, text, wide, actions, children }: ModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -24,8 +28,8 @@ export function Modal({ open, onClose, title, text, wide, actions, children }: M
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
-  return (
+  if (!open || typeof document === "undefined") return null;
+  return createPortal(
     <div
       className="fixed inset-0 z-60 bg-scrim grid place-items-center p-6"
       onClick={(event) => {
@@ -46,6 +50,7 @@ export function Modal({ open, onClose, title, text, wide, actions, children }: M
         {children ? <div className="grid gap-4 mb-6">{children}</div> : null}
         <div className="flex gap-2.5 justify-end flex-wrap">{actions}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

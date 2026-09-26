@@ -85,7 +85,7 @@ describe("API-02 — action signIn", () => {
     expect(user).toMatchObject({ nickname: "seed_admin", role: "ADMIN" });
   });
 
-  it("matches the address case-insensitively, as ENT-01's citext column does", async () => {
+  it("matches the address case-insensitively, as ENT-01's lower(email) unique index implies", async () => {
     expect(await verifyCredentials("ADMIN.SEED@EXAMPLE.TEST", ADMIN.password)).not.toBeNull();
   });
 
@@ -134,13 +134,13 @@ describe("API-02 — action signIn, session guard (ISS-05)", () => {
     authMock.mockResolvedValue(signedInSession("USER"));
     expect(
       (await refusalFrom(() => signInAction(emptySignInState, form(LEARNER)))).target,
-    ).toBe("/start");
+    ).toBe("/");
     expect(signInMock).not.toHaveBeenCalled();
 
     authMock.mockResolvedValue(signedInSession("ADMIN"));
     expect(
       (await refusalFrom(() => signInAction(emptySignInState, form(ADMIN)))).target,
-    ).toBe("/start");
+    ).toBe("/");
     expect(signInMock).not.toHaveBeenCalled();
   });
 });

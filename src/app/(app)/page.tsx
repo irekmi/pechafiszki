@@ -12,7 +12,8 @@ import { requireUser } from "@/server/permissions";
 import { getHomeSummary } from "@/server/services/getHomeSummary";
 
 /**
- * SCR-05 — the landing screen after signing in (API-08). **Zacznij naukę** and a category's
+ * SCR-05 — the landing screen after signing in (API-08), served at `/` (SQ-01.1); a Guest is
+ * redirected to SCR-01 by `requireUser`. **Zacznij naukę** and a category's
  * **Ucz się** post to `startSessionAction` (API-10, ST-08); the counter tiles point at their real
  * addresses, the screens behind which (SCR-08, …) are built in later stages. This page wires and
  * composes, it does not shape any of API-08's figures.

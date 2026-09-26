@@ -16,7 +16,7 @@ async function registerAndStart(page: Page): Promise<void> {
   await page.fill("#password", password);
   await page.fill("#password_repeat", password);
   await page.click('button[type="submit"]');
-  await page.waitForURL("**/start");
+  await page.waitForURL((url) => url.pathname === "/");
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: "Zacznij naukę" }).click();
   await page.waitForURL("**/nauka");
@@ -75,9 +75,9 @@ test.describe("SCR-07 — session summary (flow 2)", () => {
     await page.getByRole("button", { name: "Zakończ sesję" }).first().click();
     await page.waitForURL("**/podsumowanie/*");
     await page.getByRole("link", { name: "Wróć na start" }).first().click();
-    await page.waitForURL("**/start");
+    await page.waitForURL((url) => url.pathname === "/");
     await page.goto("/nauka");
-    await page.waitForURL("**/start");
+    await page.waitForURL((url) => url.pathname === "/");
   });
 
   test("nothing marked shows the empty message and keeps both actions (AC-09.10)", async ({ page }) => {

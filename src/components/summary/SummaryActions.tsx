@@ -13,7 +13,7 @@ export function SummaryActions({ filters, primary }: SummaryActionsProps) {
   return (
     <>
       <ContinueForm filters={filters} variant={continueFirst ? "primary" : "default"} />
-      <ButtonLink href="/start" variant={continueFirst ? "default" : "primary"}>
+      <ButtonLink href="/" variant={continueFirst ? "default" : "primary"}>
         Wróć na start
       </ButtonLink>
     </>

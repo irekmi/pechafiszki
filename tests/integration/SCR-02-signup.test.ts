@@ -57,18 +57,18 @@ describe("SCR-02 — access (public, redirected away when already signed in)", (
     await expect(RejestracjaPage()).resolves.toBeTruthy();
   });
 
-  it("redirects a signed-in User and Administrator to /start", async () => {
+  it("redirects a signed-in User and Administrator to /", async () => {
     authMock.mockResolvedValue(signedInSession("USER"));
-    expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/start");
+    expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/");
     authMock.mockResolvedValue(signedInSession("ADMIN"));
-    expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/start");
+    expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/");
   });
 });
 
 describe("API-01 — action signUp", () => {
   it("creates the account as USER, hashed, and signs the person in (AC-04.1)", async () => {
     const refusal = await refusalFrom(() => signUpAction(emptySignUpState, form(FRESH)));
-    expect(refusal.target).toBe("/start");
+    expect(refusal.target).toBe("/");
 
     const row = await db.user.findUniqueOrThrow({ where: { email: FRESH.email } });
     expect(row).toMatchObject({ nickname: FRESH.nickname, role: "USER" });
@@ -137,13 +137,13 @@ describe("API-01 — action signUp", () => {
   it("refuses a signed-in User/Administrator calling the action directly, no row written (CLAUDE.md §8)", async () => {
     authMock.mockResolvedValue(signedInSession("USER"));
     expect((await refusalFrom(() => signUpAction(emptySignUpState, form(FRESH)))).target).toBe(
-      "/start",
+      "/",
     );
     expect(await db.user.count({ where: { email: FRESH.email } })).toBe(0);
 
     authMock.mockResolvedValue(signedInSession("ADMIN"));
     expect((await refusalFrom(() => signUpAction(emptySignUpState, form(FRESH)))).target).toBe(
-      "/start",
+      "/",
     );
     expect(await db.user.count({ where: { email: FRESH.email } })).toBe(0);
     expect(signInMock).not.toHaveBeenCalled();

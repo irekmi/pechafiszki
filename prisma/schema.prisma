@@ -12,9 +12,11 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  // citext gives the case-insensitive uniqueness of DEC-24 and DEC-44 as a column type, so it
-  // lives in this schema and cannot drift away; pg_trgm carries the search index of DEC-49/DEC-35.
-  extensions = [citext, pg_trgm]
+  // pg_trgm carries the search index of DEC-49/DEC-35. Case-insensitive uniqueness of DEC-24 and
+  // DEC-44 is not a column type: it is the raw `lower(...)` unique indexes of migration
+  // 20260926090000_lower_unique_indexes (SQ-02.1) — Prisma cannot express them in this file. They
+  // guard uniqueness; address lookups use `lower("email") = lower($1)` (findUserByEmail, ISS-12).
+  extensions = [pg_trgm]
 }
 
 enum Role {
@@ -42,8 +44,8 @@ enum Decision {
 /// ENT-01 — a person with an account.
 model User {
   id           Int      @id @default(autoincrement())
-  email        String   @unique @db.Citext
-  nickname     String   @unique @db.Citext
+  email        String   @unique
+  nickname     String   @unique
   passwordHash String
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
@@ -62,7 +64,7 @@ model User {
 /// ENT-02 — the grouping a flashcard belongs to.
 model Category {
   id       Int    @id @default(autoincrement())
-  name     String @unique @db.Citext
+  name     String @unique
   position Int    @unique
 
   flashcards Flashcard[]

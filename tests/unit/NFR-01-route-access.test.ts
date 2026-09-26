@@ -11,7 +11,7 @@ import {
 describe("NFR-01 — the protected path table", () => {
   it("protects every signed-in address of spec/permissions.md", () => {
     for (const path of [
-      "/start",
+      "/",
       "/nauka",
       "/podsumowanie",
       "/fiszki",
@@ -30,7 +30,7 @@ describe("NFR-01 — the protected path table", () => {
   });
 
   it("leaves the four public screens open", () => {
-    for (const path of ["/", "/logowanie", "/rejestracja", "/reset-hasla", "/nowe-haslo"]) {
+    for (const path of ["/logowanie", "/rejestracja", "/reset-hasla", "/nowe-haslo"]) {
       expect(isProtectedPath(path), path).toBe(false);
     }
   });
@@ -46,6 +46,9 @@ describe("NFR-01 — the protected path table", () => {
       `${SIGN_IN_PATH}?powrot=${encodeURIComponent("/fiszki?kategoria=PHP")}`,
     );
     expect(signInUrlFor("/rejestracja")).toBe(SIGN_IN_PATH);
+    // SQ-01.1: SCR-05 is `/`, and SCR-01 returns a signed-in person there by itself.
+    expect(signInUrlFor("/")).toBe(SIGN_IN_PATH);
+    expect(SIGNED_IN_HOME).toBe("/");
   });
 
   it("refuses to be turned into an open redirect", () => {
@@ -63,6 +66,7 @@ describe("NFR-01 — the protected path table", () => {
   });
 
   it("keeps a genuine protected path, query and all", () => {
+    expect(safeReturnPath("/")).toBe("/");
     expect(safeReturnPath("/fiszki?kategoria=PHP")).toBe("/fiszki?kategoria=PHP");
     expect(safeReturnPath("/administracja/oczekujace")).toBe("/administracja/oczekujace");
     // A public screen is not a place a forced sign-in should return to.

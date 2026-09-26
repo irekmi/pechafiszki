@@ -66,7 +66,7 @@ export async function createAccount(input: SignUpInput): Promise<SignUpResult> {
 }
 
 /**
- * `email` and `nickname` are both `citext` unique columns (ENT-01), so a race between two
+ * `email` and `nickname` are both unique case-insensitively, through `lower(...)` indexes (SQ-02.1), so a race between two
  * simultaneous registrations is caught here, not by a pre-check that could itself lose the race.
  *
  * The driver adapter Prisma 7 requires (`src/server/db.ts`) does not fill `meta.target` with the

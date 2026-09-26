@@ -15,7 +15,7 @@ async function register(page: Page): Promise<void> {
   await page.fill("#password", password);
   await page.fill("#password_repeat", password);
   await page.click('button[type="submit"]');
-  await page.waitForURL("**/start");
+  await page.waitForURL((url) => url.pathname === "/");
   await page.waitForLoadState("networkidle");
 }
 

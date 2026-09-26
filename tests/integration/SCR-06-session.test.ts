@@ -27,7 +27,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 vi.mock("next/headers", () => ({
-  headers: vi.fn(async () => new Headers({ "x-pathname": "/start" })),
+  headers: vi.fn(async () => new Headers({ "x-pathname": "/" })),
   cookies: vi.fn(async () => ({ has: () => false })),
 }));
 
@@ -270,7 +270,7 @@ describe("SCR-06 — filters rebuild the queue inside the session (AC-08.8, AC-0
 
   it("the applySessionFiltersAction sends a caller with no session to SCR-05, and a Guest to SCR-01", async () => {
     await signedInUser();
-    expect(await refusalFrom(() => applySessionFiltersAction({}))).toMatchObject({ target: "/start" });
+    expect(await refusalFrom(() => applySessionFiltersAction({}))).toMatchObject({ target: "/" });
     authMock.mockResolvedValue(null);
     expect(await refusalFrom(() => applySessionFiltersAction({}))).toMatchObject({ kind: "redirect" });
   });

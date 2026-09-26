@@ -78,6 +78,12 @@ describe("SCR-03 / API-03 — requestPasswordReset", () => {
     expect(sendMock).toHaveBeenCalledTimes(1);
   });
 
+  it("finds the account whatever the case of the typed address (SQ-02.1)", async () => {
+    await createUser({ email: "Known@Example.Test" });
+    await requestPasswordResetAction(emptyResetHaslaState, form({ email: "known@example.test" }));
+    expect(sendMock).toHaveBeenCalledTimes(1);
+  });
+
   it("invalidates a previously issued link when a new one is requested (AC-05.2)", async () => {
     const user = await createUser({ email: "known@example.test" });
 
@@ -158,7 +164,7 @@ describe("SCR-03 / API-03 — requestPasswordReset", () => {
     const refusal = await refusalFrom(() =>
       requestPasswordResetAction(emptyResetHaslaState, form({ email: "known@example.test" })),
     );
-    expect(refusal.target).toBe("/start");
+    expect(refusal.target).toBe("/");
     expect(sendMock).not.toHaveBeenCalled();
   });
 });
@@ -280,7 +286,7 @@ describe("SCR-04 / API-05 — setNewPassword", () => {
       ),
     );
 
-    expect(refusal.target).toBe("/start");
+    expect(refusal.target).toBe("/");
     authMock.mockResolvedValue(null);
     expect((await validateResetToken(raw)).valid).toBe(true);
   });

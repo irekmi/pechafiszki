@@ -43,10 +43,12 @@ test.describe("SCR-01 — logowanie", () => {
 });
 
 test.describe("NFR-01 — a Guest at a protected address", () => {
-  for (const path of ["/start", "/fiszki", "/administracja"]) {
+  for (const path of ["/", "/fiszki", "/administracja"]) {
     test(`${path} sends a Guest to SCR-01, carrying the address (AC-03.3)`, async ({ page }) => {
       await page.goto(path);
-      await expect(page).toHaveURL(`/logowanie?powrot=${encodeURIComponent(path)}`);
+      // SCR-01 returns a signed-in person to SCR-05 on its own, so `/` carries no return address.
+      const expected = path === "/" ? "/logowanie" : `/logowanie?powrot=${encodeURIComponent(path)}`;
+      await expect(page).toHaveURL(expected);
       await expect(page.getByRole("heading", { name: "Zaloguj się" })).toBeVisible();
     });
   }

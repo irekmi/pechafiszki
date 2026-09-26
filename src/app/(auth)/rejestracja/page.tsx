@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Utwórz konto — Fiszki na rozmowy 
 /**
  * SCR-02 — open to a Guest only; a signed-in person is sent on to SCR-05, exactly as the screen's
  * own Access table states. Unlike SCR-01 there is no `?powrot=` here: registration has no address
- * that forced it, so a signed-in visitor always lands on `/start`.
+ * that forced it, so a signed-in visitor always lands on `/`.
  */
 export default async function RejestracjaPage() {
   if (await currentUser()) redirect(SIGNED_IN_HOME);

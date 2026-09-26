@@ -8,11 +8,14 @@
  */
 
 export const SIGN_IN_PATH = "/logowanie";
-export const SIGNED_IN_HOME = "/start";
+/** SCR-05 start is served at `/` (SQ-01.1); `/start` is a permanent redirect in next.config.ts. */
+export const SIGNED_IN_HOME = "/";
 
-/** SCR-05 … SCR-14, SCR-23 — every address that needs a session (spec/permissions.md). */
+/**
+ * SCR-06 … SCR-14, SCR-23 — every address that needs a session (spec/permissions.md). SCR-05 at
+ * `/` is protected too, but `/` matches only itself, so `isProtectedPath` handles it apart.
+ */
 const PROTECTED_PREFIXES = [
-  "/start",
   "/nauka",
   "/podsumowanie",
   "/fiszki",
@@ -32,6 +35,7 @@ function matches(pathname: string, prefix: string): boolean {
 }
 
 export function isProtectedPath(pathname: string): boolean {
+  if (pathname === SIGNED_IN_HOME) return true;
   return PROTECTED_PREFIXES.some((prefix) => matches(pathname, prefix));
 }
 
@@ -55,6 +59,7 @@ export function safeReturnPath(raw: string | null | undefined): string {
 /** The address a Guest is sent to, carrying the path that forced the sign-in. */
 export function signInUrlFor(pathname: string, search = ""): string {
   const target = `${pathname}${search}`;
-  if (!isProtectedPath(pathname)) return SIGN_IN_PATH;
+  // SCR-01 already returns a signed-in person to SCR-05, so `/` needs no `?powrot=`.
+  if (!isProtectedPath(pathname) || target === SIGNED_IN_HOME) return SIGN_IN_PATH;
   return `${SIGN_IN_PATH}?powrot=${encodeURIComponent(target)}`;
 }

@@ -6,11 +6,23 @@ export function Datalist({ className, children }: { className?: string; children
   return <div className={cn("grid gap-0", className)}>{children}</div>;
 }
 
-export function DatalistRow({ label, value }: { label: ReactNode; value: ReactNode }) {
+type DatalistRowProps = {
+  label: ReactNode;
+  value: ReactNode;
+  /** The value sits under its label, left-aligned — for a list too long for the right-hand column. */
+  stacked?: boolean;
+};
+
+export function DatalistRow({ label, value, stacked }: DatalistRowProps) {
   return (
-    <div className="flex justify-between gap-4 py-3 border-b border-line last:border-b-0 text-14">
+    <div
+      className={cn(
+        "flex justify-between gap-4 py-3 border-b border-line last:border-b-0 text-14",
+        stacked && "flex-col gap-2",
+      )}
+    >
       <span className="text-ink-2">{label}</span>
-      <span className="font-bold text-right">{value}</span>
+      <span className={cn("font-bold", stacked ? "text-left" : "text-right")}>{value}</span>
     </div>
   );
 }

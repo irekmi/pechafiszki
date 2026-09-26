@@ -14,6 +14,8 @@ export type FlashcardDetail = {
     category: { id: number; name: string };
     /** When the card entered the pool; `null` until it is approved. */
     publishedAt: Date | null;
+    /** When it was submitted (SCR-17's "zgłoszona"). */
+    submittedAt: Date;
   };
   /** The author's nickname, or `null` once the account is gone (DEC-40). */
   author: string | null;
@@ -68,6 +70,7 @@ export async function getFlashcard(
       status: row.status,
       category: row.category,
       publishedAt: row.status === "APPROVED" ? (row.decidedAt ?? row.submittedAt) : null,
+      submittedAt: row.submittedAt,
     },
     author: row.author?.nickname ?? null,
     mark: progress?.mark ?? null,

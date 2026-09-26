@@ -7,7 +7,7 @@ import { FilterBar } from "@/components/ui/FilterBar";
 import { SearchField } from "@/components/ui/SearchField";
 import type { CategoryRow } from "@/server/services/listCategories";
 import { libraryQuery, parseLibraryParams, type LibraryParams } from "@/server/services/libraryParams";
-import { FilterSelect } from "./FilterSelect";
+import { FilterSelect } from "@/components/ui/FilterSelect";
 
 const MARKS = [
   { value: "", label: "Wszystkie" },

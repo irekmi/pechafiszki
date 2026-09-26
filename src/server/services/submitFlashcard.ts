@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/server/db";
+import { cleanText } from "./cleanText";
 
 /**
  * API-16 — writes one flashcard into the approval queue. Nothing here reads a status or an author
@@ -13,12 +14,7 @@ export const CATEGORY_MESSAGE = "Wybierz kategorię";
 const MAX_QUESTION = 200;
 const MAX_TEXT = 1200;
 
-/**
- * Browsers submit a textarea with CRLF although `maxlength` counted it as LF, and PostgreSQL cannot
- * store a NUL byte; both are normalised before any length is measured.
- */
-const clean = (value: string): string => value.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\0", "");
-const text = z.string().default("").transform(clean);
+const text = z.string().default("").transform(cleanText);
 
 export const submitFlashcardSchema = z.object({
   category: z

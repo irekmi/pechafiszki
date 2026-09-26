@@ -136,3 +136,8 @@
     transparent 8px 14px
   );
 }
+
+/* `.subnav__inner { scrollbar-width: none }` — a horizontal strip that scrolls without a bar. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+}

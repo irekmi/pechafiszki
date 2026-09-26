@@ -1,5 +1,5 @@
-import { FilterItem, FilterLabel } from "@/components/ui/FilterBar";
-import { Select } from "@/components/ui/Input";
+import { FilterItem, FilterLabel } from "./FilterBar";
+import { Select } from "./Input";
 
 type FilterSelectProps = {
   id: string;

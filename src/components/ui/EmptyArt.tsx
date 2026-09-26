@@ -32,3 +32,13 @@ export function NoSubmissionsArt() {
     </svg>
   );
 }
+
+/** `16-administracja-fiszki-oczekujace-pusty.html` — a green card with a tick: the queue is clear. */
+export function AllReviewedArt() {
+  return (
+    <svg viewBox="0 0 132 92" aria-hidden="true" className="block w-full h-full">
+      <rect x="24" y="14" width="84" height="62" rx="10" className="fill-know-soft stroke-know" strokeWidth="2" />
+      <path d="M52 46l10 10 20-22" fill="none" className="stroke-know" strokeWidth="3.2" strokeLinecap="round" />
+    </svg>
+  );
+}

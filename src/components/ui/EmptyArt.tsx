@@ -22,3 +22,13 @@ export function EmptyPoolArt() {
     </svg>
   );
 }
+
+/** `11-moje-fiszki-pusty.html` — a blank card with a plus: nothing submitted yet. */
+export function NoSubmissionsArt() {
+  return (
+    <svg viewBox="0 0 132 92" aria-hidden="true" className="block w-full h-full">
+      <rect x="22" y="12" width="88" height="64" rx="10" className="fill-surface-2 stroke-surface-3" strokeWidth="2" />
+      <path d="M66 30v28M52 44h28" className="stroke-brand" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}

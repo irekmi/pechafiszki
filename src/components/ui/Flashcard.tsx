@@ -51,7 +51,7 @@ export function Flashcard({
       className={cn(
         "bg-surface border-ink rounded-lg grid gap-5 content-start",
         preview
-          ? "border p-6 min-h-0 shadow-none bg-surface-2"
+          ? "border px-5 py-6 md:p-6 min-h-0 shadow-none bg-surface-2"
           : "border-2 px-5 py-6 min-h-60 md:px-10 md:py-9",
         variant === "flip" && "shadow-hard-6 cursor-pointer md:min-h-75",
         variant === "static" && "shadow-hard cursor-default md:min-h-75",
@@ -66,7 +66,7 @@ export function Flashcard({
         </p>
       ) : null}
       {revealed && (answer || example) ? (
-        <div className="grid gap-4.5">
+        <div className={preview ? "contents" : "grid gap-4.5"}>
           <div className="h-0.5 flashcard-divider" />
           {answer ? (
             <>

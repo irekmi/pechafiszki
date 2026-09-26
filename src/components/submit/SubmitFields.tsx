@@ -1,0 +1,97 @@
+import { Field, INVALID_FIELD_CLASS } from "@/components/ui/Field";
+import { Input, Select, Textarea } from "@/components/ui/Input";
+import type { SubmitErrors } from "@/server/actions/submitFlashcardState";
+import type { CategoryRow } from "@/server/services/listCategories";
+import type { SubmitValues } from "./submitValues";
+
+type SubmitFieldsProps = {
+  values: SubmitValues;
+  errors: SubmitErrors;
+  categories: Pick<CategoryRow, "id" | "name">[];
+  disabled: boolean;
+  onChange: (name: keyof SubmitValues, value: string) => void;
+};
+
+/** SCR-10 elements 3–6: the category select, the question, the answer and the optional code example. */
+export function SubmitFields({ values, errors, categories, disabled, onChange }: SubmitFieldsProps) {
+  const invalid = (message?: string) => (message ? INVALID_FIELD_CLASS : undefined);
+  return (
+    <>
+      <Field label="Kategoria" htmlFor="category" error={errors.category}>
+        <Select
+          id="category"
+          name="category"
+          required
+          disabled={disabled}
+          value={values.category}
+          onChange={(event) => onChange("category", event.target.value)}
+          className={invalid(errors.category)}
+        >
+          <option value="">Wybierz kategorię</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+
+      <Field
+        label="Pytanie"
+        htmlFor="question"
+        hint="Jedno pytanie na fiszkę, tak jak zadałby je rekruter."
+        error={errors.question}
+      >
+        <Input
+          id="question"
+          name="question"
+          type="text"
+          required
+          maxLength={200}
+          disabled={disabled}
+          placeholder="np. Do czego służy useMemo i kiedy go nie używać?"
+          value={values.question}
+          onChange={(event) => onChange("question", event.target.value)}
+          className={invalid(errors.question)}
+        />
+      </Field>
+
+      <Field label="Odpowiedź" htmlFor="answer" error={errors.answer}>
+        <Textarea
+          id="answer"
+          name="answer"
+          required
+          maxLength={1200}
+          disabled={disabled}
+          placeholder="Wpisz odpowiedź, którą chcesz pamiętać na rozmowie"
+          value={values.answer}
+          onChange={(event) => onChange("answer", event.target.value)}
+          className={invalid(errors.answer)}
+        />
+      </Field>
+
+      <Field
+        label={
+          <>
+            Przykład kodu <span className="font-normal text-ink-3">— opcjonalnie</span>
+          </>
+        }
+        htmlFor="code_example"
+        hint="Kod pokaże się pod odpowiedzią, w osobnym bloku."
+        error={errors.codeExample}
+      >
+        <Textarea
+          id="code_example"
+          name="code_example"
+          code
+          maxLength={1200}
+          disabled={disabled}
+          placeholder="const wynik = useMemo(() => policz(dane), [dane]);"
+          value={values.codeExample}
+          onChange={(event) => onChange("codeExample", event.target.value)}
+          className={invalid(errors.codeExample)}
+        />
+      </Field>
+    </>
+  );
+}

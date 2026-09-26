@@ -28,7 +28,7 @@ const authMock = asSessionMock(auth);
 
 type Person = { id: number; role: "USER" | "ADMIN"; nickname: string };
 type Counts = { all: number; pending: number; approved: number; rejected: number };
-type Props = { rows: { id: number; status: string }[]; counts: Counts; status?: string; submitted: boolean };
+type Props = { rows: { id: number; status: string }[]; counts: Counts; status?: string; notice?: string };
 
 function signInAs(user: Person): void {
   authMock.mockResolvedValue({
@@ -131,9 +131,10 @@ describe("SCR-11 — tabs and counts (AC-13.9)", () => {
 
   it("the arrival notice is a fixed code, never free text", async () => {
     signInAs(await createUser());
-    expect((await open({ zmiana: "wyslana" })).submitted).toBe(true);
-    expect((await open({ zmiana: "<b>x</b>" })).submitted).toBe(false);
-    expect((await open()).submitted).toBe(false);
+    expect((await open({ zmiana: "wyslana" })).notice).toBe("wyslana");
+    expect((await open({ zmiana: "zapisana" })).notice).toBe("zapisana");
+    expect((await open({ zmiana: "<b>x</b>" })).notice).toBeUndefined();
+    expect((await open()).notice).toBeUndefined();
   });
 });
 

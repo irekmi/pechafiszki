@@ -2,6 +2,7 @@ import { Field, INVALID_FIELD_CLASS } from "@/components/ui/Field";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import type { SubmitErrors } from "@/server/actions/submitFlashcardState";
 import type { CategoryRow } from "@/server/services/listCategories";
+import { PLAIN_COPY, SUBMIT_COPY } from "./submitCopy";
 import type { SubmitValues } from "./submitValues";
 
 type SubmitFieldsProps = {
@@ -9,11 +10,14 @@ type SubmitFieldsProps = {
   errors: SubmitErrors;
   categories: Pick<CategoryRow, "id" | "name">[];
   disabled: boolean;
+  /** SCR-12: no hints, placeholders or empty category option. */
+  plain?: boolean;
   onChange: (name: keyof SubmitValues, value: string) => void;
 };
 
-/** SCR-10 elements 3–6: the category select, the question, the answer and the optional code example. */
-export function SubmitFields({ values, errors, categories, disabled, onChange }: SubmitFieldsProps) {
+/** The category select, the question, the answer and the optional code example (SCR-10 el. 3–6, SCR-12). */
+export function SubmitFields({ values, errors, categories, disabled, plain, onChange }: SubmitFieldsProps) {
+  const copy = plain ? PLAIN_COPY : SUBMIT_COPY;
   const invalid = (message?: string) => (message ? INVALID_FIELD_CLASS : undefined);
   return (
     <>
@@ -27,7 +31,7 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
           onChange={(event) => onChange("category", event.target.value)}
           className={invalid(errors.category)}
         >
-          <option value="">Wybierz kategorię</option>
+          {copy.emptyOption ? <option value="">{copy.emptyOption}</option> : null}
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
@@ -39,7 +43,7 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
       <Field
         label="Pytanie"
         htmlFor="question"
-        hint="Jedno pytanie na fiszkę, tak jak zadałby je rekruter."
+        hint={copy.questionHint}
         error={errors.question}
       >
         <Input
@@ -49,7 +53,7 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
           required
           maxLength={200}
           disabled={disabled}
-          placeholder="np. Do czego służy useMemo i kiedy go nie używać?"
+          placeholder={copy.questionPlaceholder}
           value={values.question}
           onChange={(event) => onChange("question", event.target.value)}
           className={invalid(errors.question)}
@@ -63,7 +67,7 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
           required
           maxLength={1200}
           disabled={disabled}
-          placeholder="Wpisz odpowiedź, którą chcesz pamiętać na rozmowie"
+          placeholder={copy.answerPlaceholder}
           value={values.answer}
           onChange={(event) => onChange("answer", event.target.value)}
           className={invalid(errors.answer)}
@@ -71,13 +75,9 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
       </Field>
 
       <Field
-        label={
-          <>
-            Przykład kodu <span className="font-normal text-ink-3">— opcjonalnie</span>
-          </>
-        }
+        label={<>Przykład kodu <span className="font-normal text-ink-3">— opcjonalnie</span></>}
         htmlFor="code_example"
-        hint="Kod pokaże się pod odpowiedzią, w osobnym bloku."
+        hint={copy.codeHint}
         error={errors.codeExample}
       >
         <Textarea
@@ -86,7 +86,7 @@ export function SubmitFields({ values, errors, categories, disabled, onChange }:
           code
           maxLength={1200}
           disabled={disabled}
-          placeholder="const wynik = useMemo(() => policz(dane), [dane]);"
+          placeholder={copy.codePlaceholder}
           value={values.codeExample}
           onChange={(event) => onChange("codeExample", event.target.value)}
           className={invalid(errors.codeExample)}

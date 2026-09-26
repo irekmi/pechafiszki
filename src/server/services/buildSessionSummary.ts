@@ -1,9 +1,8 @@
 import type { StudySession } from "@prisma/client";
-import { countResetCards } from "@/domain/countResetCards";
-import { hiddenInSession } from "@/domain/hiddenInSession";
 import { sessionDurationMinutes } from "@/domain/sessionDuration";
-import { summariseSession } from "@/domain/summariseSession";
 import { db } from "@/server/db";
+import { countSession, loadSessionEvents } from "./countSession";
+import { parseFrozenFigures } from "./frozenSummary";
 import { loadUnknownCards, type UnknownCard } from "./loadUnknownCards";
 import { parseStoredFilters, parseStoredQueue, type SessionFilters } from "./sessionFilters";
 
@@ -27,34 +26,15 @@ export type SessionSummary = {
 };
 
 /**
- * Every figure of a finished session, read from **its own** Review Events — the query filters on
- * `sessionId`, so a marking with a null session (SCR-09, AQ-001) can never appear. The counting
- * rules are `src/domain/` functions (DEC-19, DEC-20, DEC-05); nothing is read from the cards' current
- * state, so re-marking a card later never changes an old summary (AC-09.7).
+ * Every figure of a finished session. The counters come from the figures frozen when a card it marked
+ * was deleted (DEC-37), otherwise from **its own** Review Events (`countSession`) — so a marking with
+ * a null session (SCR-09, AQ-001) can never appear and re-marking a card later never changes an old
+ * summary (AC-09.7). The "Nie umiem" list is the cards that still exist.
  */
 export async function buildSessionSummary(session: StudySession & { endedAt: Date }): Promise<SessionSummary> {
-  const events = await db.reviewEvent.findMany({
-    where: { sessionId: session.id },
-    orderBy: { id: "asc" },
-    select: {
-      id: true,
-      flashcardId: true,
-      mark: true,
-      wasReinforcement: true,
-      countedTowardsKnow: true,
-      resetFrom: true,
-      createdAt: true,
-    },
-  });
+  const events = await loadSessionEvents(session.id);
   const filters = parseStoredFilters(session.filters);
-
-  const hidingIds = [...new Set(events.filter((event) => event.mark === "KNOW" && event.countedTowardsKnow).map((event) => event.flashcardId))];
-  const history = hidingIds.length === 0 ? [] : await db.reviewEvent.findMany({
-    where: { userId: session.userId, flashcardId: { in: hidingIds }, id: { lte: Math.max(...events.map((event) => event.id)) } },
-    orderBy: { id: "asc" },
-    select: { flashcardId: true, sessionId: true, mark: true, countedTowardsKnow: true, createdAt: true },
-  });
-  const hidden = hiddenInSession(history, session.id);
+  const figures = parseFrozenFigures(session.frozenSummary) ?? (await countSession(session, events));
 
   const category = filters.category
     ? await db.category.findUnique({ where: { id: filters.category }, select: { name: true } })
@@ -62,11 +42,8 @@ export async function buildSessionSummary(session: StudySession & { endedAt: Dat
 
   return {
     sessionId: session.id,
-    ...summariseSession(events),
+    ...figures,
     queued: parseStoredQueue(session.queue).length,
-    resetCount: countResetCards(events),
-    hiddenThisSession: hidden.count,
-    returnDate: hidden.returnDate,
     durationMinutes: sessionDurationMinutes(session.startedAt, session.endedAt),
     startedAt: session.startedAt,
     categoryName: category?.name ?? null,

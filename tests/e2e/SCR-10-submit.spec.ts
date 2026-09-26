@@ -77,7 +77,7 @@ test.describe("SCR-10 / SCR-11 — submit a flashcard", () => {
     await expect(page).toHaveURL(/\/moje-fiszki\?zmiana=wyslana$/);
     await expect(page.getByRole("status")).toHaveText("Fiszka wysłana do zatwierdzenia");
     await expect(page.getByText("1 zgłoszenie · 1 oczekuje na decyzję administratora")).toBeVisible();
-    const row = page.locator('main a[href^="/fiszki/"]');
+    const row = page.locator('main a[href^="/edytuj/"]');
     await expect(row).toHaveCount(1);
     await expect(row).toContainText("Czym różni się mock od stuba w PHPUnit?");
     await expect(row).toContainText("Testy");
@@ -107,7 +107,7 @@ test.describe("SCR-10 / SCR-11 — submit a flashcard", () => {
     await page.fill("#answer", "Atak wymuszający akcję w imieniu zalogowanego użytkownika.");
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/moje-fiszki/);
-    const href = await page.locator('main a[href^="/fiszki/"]').first().getAttribute("href");
+    const href = await page.locator('main a[href^="/edytuj/"]').first().getAttribute("href");
 
     const other = await browser.newPage();
     await register(other);
@@ -115,7 +115,7 @@ test.describe("SCR-10 / SCR-11 — submit a flashcard", () => {
     await expect(other.getByRole("heading", { level: 2, name: "Nie dodałeś jeszcze żadnej fiszki" })).toBeVisible();
     await expect(other.getByText("0 zgłoszeń")).toBeVisible();
     await expect(other.getByRole("link", { name: "Zobacz istniejące fiszki" })).toBeVisible();
-    const refused = await other.goto(href ?? "/fiszki/0");
+    const refused = await other.goto(href ?? "/edytuj/0");
     expect(refused?.status()).toBe(404);
     await other.close();
   });

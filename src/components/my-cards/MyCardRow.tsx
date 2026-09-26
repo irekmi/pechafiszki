@@ -4,13 +4,9 @@ import { ListItem } from "@/components/ui/ListItem";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import type { MyCardRow as Row } from "@/server/services/listMyFlashcards";
 
-/**
- * Where a row leads: an approved card to SCR-09. A pending or rejected one belongs to SCR-12, which
- * ST-16 builds — until then it opens the read-only detail, which its author may read (SCR-11 note
- * in stage-13). ST-16 changes this one function.
- */
+/** Where a row leads: an approved card to SCR-09, a pending or rejected one to its edit form (SCR-12). */
 export function rowHref(row: Pick<Row, "id" | "status">): string {
-  return `/fiszki/${row.id}`;
+  return row.status === "APPROVED" ? `/fiszki/${row.id}` : `/edytuj/${row.id}`;
 }
 
 /**

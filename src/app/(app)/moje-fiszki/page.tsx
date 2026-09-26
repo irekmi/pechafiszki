@@ -19,5 +19,5 @@ export default async function MojeFiszkiPage({ searchParams }: { searchParams: P
   const raw = await searchParams;
   const status = parseMyCardsStatus(raw);
   const { rows, counts } = await listMyFlashcards(user.id, status);
-  return <MyCardsScreen rows={rows} counts={counts} status={status} submitted={parseMyCardsNotice(raw) !== undefined} />;
+  return <MyCardsScreen rows={rows} counts={counts} status={status} notice={parseMyCardsNotice(raw)} />;
 }

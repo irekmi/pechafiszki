@@ -156,13 +156,17 @@ model ReviewEvent {
 
 /// ENT-07 — one sitting of study.
 model StudySession {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  startedAt DateTime  @default(now()) @db.Timestamptz(3)
-  endedAt   DateTime? @db.Timestamptz(3)
-  filters   Json      @default("{}")
-  queue     Json
-  cursor    Int       @default(0)
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  startedAt     DateTime  @default(now()) @db.Timestamptz(3)
+  endedAt       DateTime? @db.Timestamptz(3)
+  filters       Json      @default("{}")
+  queue         Json
+  cursor        Int       @default(0)
+  /// The SCR-07 counters, stored when an administrator deletes a card this session marked, so the
+  /// cascade of its Review Events cannot change a finished session's summary (DEC-37). Null otherwise:
+  /// the summary is then derived from the session's own events.
+  frozenSummary Json?
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviewEvents ReviewEvent[]

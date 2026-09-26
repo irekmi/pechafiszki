@@ -66,7 +66,7 @@ export function Flashcard({
         </p>
       ) : null}
       {revealed && (answer || example) ? (
-        <div className={preview ? "contents" : "grid gap-4.5"}>
+        <div className={preview || variant === "static" ? "contents" : "grid gap-4.5"}>
           <div className="h-0.5 flashcard-divider" />
           {answer ? (
             <>

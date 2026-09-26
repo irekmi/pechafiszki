@@ -8,6 +8,6 @@ const STATUS: Record<FlashcardStatus, { tone: BadgeTone; label: string }> = {
 };
 
 /** `.badge--approved` / `--pending` / `--rejected` — the moderation status of a flashcard. */
-export function StatusBadge({ status }: { status: FlashcardStatus }) {
-  return <Badge tone={STATUS[status].tone}>{STATUS[status].label}</Badge>;
+export function StatusBadge({ status, size }: { status: FlashcardStatus; size?: "md" | "lg" }) {
+  return <Badge tone={STATUS[status].tone} size={size}>{STATUS[status].label}</Badge>;
 }

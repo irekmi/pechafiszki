@@ -1,10 +1,8 @@
-import { z } from "zod";
 import { CardDetailScreen } from "@/components/card-detail/CardDetailScreen";
 import { refuseNotFound, requireUser } from "@/server/permissions";
+import { parseCardId } from "@/server/services/cardId";
 import { getFlashcard } from "@/server/services/getFlashcard";
 import { libraryQuery, parseLibraryParams } from "@/server/services/libraryParams";
-
-const idSchema = z.coerce.number().int().positive().max(2_147_483_647);
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -23,10 +21,10 @@ export default async function FlashcardPage({
   searchParams: Promise<SearchParams>;
 }) {
   const user = await requireUser();
-  const id = idSchema.safeParse((await params).id);
-  if (!id.success) refuseNotFound();
+  const id = parseCardId((await params).id);
+  if (id === null) refuseNotFound();
 
-  const detail = await getFlashcard(user, id.data);
+  const detail = await getFlashcard(user, id);
   if (!detail) refuseNotFound();
 
   const backHref = `/fiszki${libraryQuery(parseLibraryParams(await searchParams))}`;

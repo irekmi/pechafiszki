@@ -1,12 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { refuseNotFound, requireAdmin } from "@/server/permissions";
 import { approveFlashcard } from "@/server/services/approveFlashcard";
 import type { DecisionResult } from "@/server/services/recordDecision";
-
-const input = z.object({ id: z.number().int().min(1).max(2_147_483_647) });
+import { approveInput } from "./decisionInput";
 
 /**
  * API-20 — **Zatwierdź**. The role is read from the session, first, before anything else: a User or
@@ -15,9 +13,9 @@ const input = z.object({ id: z.number().int().min(1).max(2_147_483_647) });
  */
 export async function approveFlashcardAction(raw: unknown): Promise<DecisionResult> {
   const admin = await requireAdmin();
-  const parsed = input.safeParse(raw);
+  const parsed = approveInput.safeParse(raw);
   if (!parsed.success) refuseNotFound();
-  const result = await approveFlashcard(admin, parsed.data.id);
+  const result = await approveFlashcard(admin, parsed.data.id, parsed.data.category);
   revalidatePath("/", "layout");
   return result;
 }

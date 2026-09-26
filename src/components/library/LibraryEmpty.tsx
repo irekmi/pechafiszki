@@ -24,15 +24,15 @@ export function EmptyPool() {
   );
 }
 
-/** The pool is not empty, the filters match nothing; **Wyczyść filtry** drops every parameter. */
-export function NoMatch() {
+/** The filters match nothing; **Wyczyść filtry** drops every parameter (SCR-08 by default, SCR-18 with its own address). */
+export function NoMatch({ clearHref = "/fiszki" }: { clearHref?: string }) {
   const router = useRouter();
   return (
     <EmptyState
       art={<NoResultsArt />}
       title="Żadna fiszka nie spełnia Twoich filtrów"
       actions={
-        <Button variant="primary" onClick={() => router.push("/fiszki", { scroll: false })}>
+        <Button variant="primary" onClick={() => router.push(clearHref, { scroll: false })}>
           Wyczyść filtry
         </Button>
       }

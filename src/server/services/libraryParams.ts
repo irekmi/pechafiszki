@@ -37,6 +37,9 @@ function normaliseLimit(value: number): number {
   return value >= LIBRARY_PAGE_SIZE && value % LIBRARY_PAGE_SIZE === 0 ? value : LIBRARY_PAGE_SIZE;
 }
 
+/** Shared with SCR-18's parameters (`adminCardsParams`): the same search phrase, category id and page size. */
+export { query as querySchema, category as categorySchema, limit as limitSchema };
+
 type RawParams = Record<string, string | string[] | undefined>;
 
 function first(raw: RawParams, name: string): string | undefined {

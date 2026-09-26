@@ -1,6 +1,4 @@
-import { ButtonLink } from "@/components/ui/Button";
-import { Row } from "@/components/ui/Page";
-import { Hint } from "@/components/ui/Typography";
+import { PagingFooter } from "@/components/ui/PagingFooter";
 import { libraryQuery, LIBRARY_MAX_LIMIT, LIBRARY_PAGE_SIZE, type LibraryParams } from "@/server/services/libraryParams";
 
 type LibraryFooterProps = { params: LibraryParams; shown: number; total: number };
@@ -9,14 +7,5 @@ type LibraryFooterProps = { params: LibraryParams; shown: number; total: number 
 export function LibraryFooter({ params, shown, total }: LibraryFooterProps) {
   const more = shown < total && params.limit < LIBRARY_MAX_LIMIT;
   const next = { ...params, limit: params.limit + LIBRARY_PAGE_SIZE };
-  return (
-    <Row between>
-      <Hint>{`Pokazano ${shown} z ${total} ${total === 1 ? "fiszki" : "fiszek"}`}</Hint>
-      {more ? (
-        <ButtonLink href={`/fiszki${libraryQuery(next)}`} scroll={false}>
-          Pokaż więcej
-        </ButtonLink>
-      ) : null}
-    </Row>
-  );
+  return <PagingFooter shown={shown} total={total} moreHref={more ? `/fiszki${libraryQuery(next)}` : null} />;
 }

@@ -27,7 +27,7 @@ export function AllHidden({ categoryName, returnDate }: AllHiddenProps) {
       </Muted>
       <CardFoot>
         <Row>
-          <ButtonLink variant="primary" href="/start">
+          <ButtonLink variant="primary" href="/">
             Wybierz inną kategorię
           </ButtonLink>
           <ButtonLink href="/statystyki">Zobacz moje statystyki</ButtonLink>

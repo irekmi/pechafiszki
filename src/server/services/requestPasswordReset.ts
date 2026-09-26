@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { db } from "@/server/db";
 import { sendPasswordResetEmail } from "@/server/mail";
+import { findUserByEmail } from "./findUserByEmail";
 import { hashToken } from "./validateResetToken";
 
 /**
@@ -35,7 +36,7 @@ function baseUrl(): string {
 /**
  * Always resolves, whether or not the address exists and whether or not SMTP itself works — the
  * caller (`reset-hasla/actions.ts`) renders the identical notice regardless (AC-05.1, `CLAUDE.md`
- * §8). `email` is `citext`, so the lookup is already case-insensitive.
+ * §8). `email` is unique through `lower("email")` (SQ-02.1), so the lookup is case-insensitive.
  *
  * Timing symmetry: a known address used to additionally run `deleteMany` + `create` + an *awaited*
  * SMTP round trip before resolving, so a known address was measurably slower to respond to than an
@@ -47,7 +48,7 @@ function baseUrl(): string {
  * and the action returns without waiting to hear whether it was delivered.
  */
 export async function requestPasswordReset(email: string): Promise<void> {
-  const user = await db.user.findUnique({ where: { email }, select: { id: true, email: true } });
+  const user = await findUserByEmail(email);
   const userId = user?.id ?? DUMMY_USER_ID;
 
   // "Requesting a new link invalidates any outstanding one for that account" (ENT-09). For an

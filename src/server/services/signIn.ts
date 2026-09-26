@@ -1,7 +1,7 @@
 import { verify } from "argon2";
 import type { Role } from "@prisma/client";
 import { z } from "zod";
-import { db } from "@/server/db";
+import { findUserByEmail } from "./findUserByEmail";
 
 /**
  * API-02 — verifies a pair of credentials. Returns the person, or `null`; the two failure causes
@@ -33,11 +33,9 @@ export async function verifyCredentials(
   const address = email.trim();
   if (address === "" || password === "") return null;
 
-  // `email` is citext, so the lookup is already case-insensitive (ENT-01).
-  const row = await db.user.findUnique({
-    where: { email: address },
-    select: { id: true, email: true, nickname: true, role: true, passwordHash: true },
-  });
+  // The address is unique case-insensitively through `lower("email")` (SQ-02.1), so the lookup
+  // compares case-insensitively too — literally, with no wildcard semantics (ISS-12).
+  const row = await findUserByEmail(address);
 
   const matches = await verifyQuietly(row?.passwordHash ?? ABSENT_USER_HASH, password);
   if (!row || !matches) return null;

@@ -11,7 +11,7 @@ import { emptySignUpState, type SignUpState } from "./signUpState";
  * API-01. Only the four documented fields are read; a `role` submitted alongside them is never
  * parsed and could not become anything anyway — the row is always written with `role: "USER"`
  * (CLAUDE.md §8, AC-04.6). On success the same credentials sign the person in immediately (SCR-02
- * behaviour row 1) and land on `/start`; ST-07 owns SCR-05 itself.
+ * behaviour row 1) and land on `/` (SCR-05, SQ-01.1).
  *
  * The page already redirects a signed-in visitor away from SCR-02, but a server action is a public
  * endpoint of its own — it re-checks the session here too (CLAUDE.md §8), so calling it directly

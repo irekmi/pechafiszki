@@ -3,8 +3,9 @@ import { db } from "@/server/db";
 import { createCategory, createUser, resetDatabase } from "./setup/fixtures";
 
 // AC-02.6 — DEC-24 and DEC-44: a category name and a nickname are unique case-insensitively, and
-// so is the address. The uniqueness is a citext column plus its unique index, so it holds against a
-// direct insert and not only against the service that guards the form.
+// so is the address. The uniqueness is a unique index over lower(...) on a plain text column
+// (SQ-02.1), so it holds against a direct insert and not only against the service that guards the
+// form; a lookup must compare case-insensitively itself.
 
 describe("case-insensitive uniqueness", () => {
   beforeEach(resetDatabase);
@@ -17,14 +18,18 @@ describe("case-insensitive uniqueness", () => {
 
   it("finds a category by a differently cased name", async () => {
     await createCategory("TypeScript", 7);
-    const found = await db.category.findUnique({ where: { name: "typescript" } });
+    const found = await db.category.findFirst({
+      where: { name: { equals: "typescript", mode: "insensitive" } },
+    });
     expect(found?.name).toBe("TypeScript");
   });
 
   it("refuses a second nickname that differs only in case, and keeps it as typed (DEC-44)", async () => {
     await createUser({ nickname: "Anna_W" });
     await expect(createUser({ nickname: "anna_w" })).rejects.toThrow();
-    const stored = await db.user.findUnique({ where: { nickname: "ANNA_W" } });
+    const stored = await db.user.findFirst({
+      where: { nickname: { equals: "ANNA_W", mode: "insensitive" } },
+    });
     expect(stored?.nickname).toBe("Anna_W");
   });
 

@@ -17,7 +17,7 @@ async function register(page: Page): Promise<void> {
   await page.fill("#password", password);
   await page.fill("#password_repeat", password);
   await page.click('button[type="submit"]');
-  await page.waitForURL("**/start");
+  await page.waitForURL((url) => url.pathname === "/");
   await page.waitForLoadState("networkidle");
 }
 
@@ -65,10 +65,10 @@ test.describe("SCR-09 — flashcard detail", () => {
     await expect(datalistValue(page, "Ukryta do")).toHaveText("nie dotyczy");
     await expect(datalistValue(page, "Aktualna ocena")).toHaveText("Nie umiem");
 
-    await page.goto("/start");
+    await page.goto("/");
     await expect(page.getByRole("link", { name: /Nie umiem/ })).toContainText("1");
     await page.goto("/nauka");
-    await expect(page).toHaveURL(/\/start$/);
+    await expect(page).toHaveURL(/\/$/);
   });
 
   test("Wróć do listy keeps the filters; Ucz się z tej kategorii starts a session (AC-12.7)", async ({ page }) => {

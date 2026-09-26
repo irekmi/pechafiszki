@@ -17,7 +17,7 @@ export function EmptyPool() {
           <ButtonLink href="/dodaj" variant="primary" size="lg">
             Dodaj fiszkę
           </ButtonLink>
-          <ButtonLink href="/start">Wróć na start</ButtonLink>
+          <ButtonLink href="/">Wróć na start</ButtonLink>
         </>
       }
     />

@@ -45,7 +45,7 @@ export function ErrorScreen({ variant, signedIn, staleSession }: ErrorScreenProp
         <EmptyActions className="w-full">
           {signedIn ? (
             <>
-              <ButtonLink href="/start" variant="primary" size="lg">
+              <ButtonLink href="/" variant="primary" size="lg">
                 Wróć na start
               </ButtonLink>
               <ButtonLink href="/fiszki" size="lg">

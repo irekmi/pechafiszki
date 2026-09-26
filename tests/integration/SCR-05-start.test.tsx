@@ -24,7 +24,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 vi.mock("next/headers", () => ({
-  headers: vi.fn(async () => new Headers({ "x-pathname": "/start" })),
+  headers: vi.fn(async () => new Headers({ "x-pathname": "/" })),
   cookies: vi.fn(async () => ({ has: () => false })),
 }));
 
@@ -32,7 +32,7 @@ const { auth } = await import("@/server/auth");
 const { currentUser } = await import("@/server/permissions");
 const { TopBar } = await import("@/components/shell/TopBar");
 const { getPendingQueueCount } = await import("@/server/services/getPendingQueueCount");
-const StartPage = (await import("@/app/(app)/start/page")).default;
+const StartPage = (await import("@/app/(app)/page")).default;
 
 const authMock = asSessionMock(auth);
 

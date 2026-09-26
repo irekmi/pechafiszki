@@ -27,19 +27,23 @@ test.describe("NFR-03 flow 1 — rejestracja → logowanie → start", () => {
     await page.fill("#password_repeat", password);
     await page.click('button[type="submit"]');
 
-    await page.waitForURL("**/start");
+    await page.waitForURL((url) => url.pathname === "/");
     await expect(page.getByRole("heading", { name: `Cześć, ${nickname}` })).toBeVisible();
     await expect(page.locator('a[href="/fiszki?mark=know"]')).toContainText("0% puli");
 
-    await page.context().clearCookies();
+    // SQ-01.1: the old address is kept as a permanent redirect to SCR-05 at `/`.
     await page.goto("/start");
-    await expect(page).toHaveURL(`/logowanie?powrot=${encodeURIComponent("/start")}`);
+    await expect(page).toHaveURL("/");
+
+    await page.context().clearCookies();
+    await page.goto("/");
+    await expect(page).toHaveURL("/logowanie");
 
     await page.fill("#email", email);
     await page.fill("#password", password);
     await page.click('button[type="submit"]');
 
-    await page.waitForURL("**/start");
+    await page.waitForURL((url) => url.pathname === "/");
     await expect(page.getByRole("heading", { name: `Cześć, ${nickname}` })).toBeVisible();
     await expect(page.getByRole("link", { name: "Administracja" })).toHaveCount(0);
   });

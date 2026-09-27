@@ -2,11 +2,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AllReviewedArt } from "@/components/ui/EmptyArt";
 
-/**
- * `16-administracja-fiszki-oczekujace-pusty.html`. **Wróć do przeglądu** lands on SCR-05 until ST-20
- * builds SCR-15 — that stage changes this one constant.
- */
-const OVERVIEW_HREF = "/";
+/** `16-administracja-fiszki-oczekujace-pusty.html`. **Wróć do przeglądu** → SCR-15 (ST-20). */
+const OVERVIEW_HREF = "/administracja";
 
 export function QueueEmpty() {
   return (

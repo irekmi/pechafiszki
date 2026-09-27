@@ -6,6 +6,7 @@
  */
 const NOTICES = {
   "haslo-zmienione": "Hasło zmienione. Możesz się zalogować.",
+  "konto-usuniete": "Twoje konto zostało usunięte.",
 } as const;
 
 type NoticeCode = keyof typeof NOTICES;

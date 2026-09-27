@@ -18,6 +18,8 @@ export type HomeSummary = {
   categories: HomeCategory[];
   own: { pending: number; approved: number; rejected: number };
   pendingQueue?: number;
+  /** Every `StudySession` this person has opened, ever — SCR-23's "Historia sesji" (ST-22). */
+  sessionsCount: number;
 };
 
 /**
@@ -30,7 +32,7 @@ export async function getHomeSummary(
   nickname: string,
   isAdmin: boolean,
 ): Promise<HomeSummary> {
-  const [approved, ownFirstKnown, pending, approvedCount, rejected, categoryRows] = await Promise.all([
+  const [approved, ownFirstKnown, pending, approvedCount, rejected, categoryRows, sessionsCount] = await Promise.all([
     db.flashcard.findMany({
       where: { status: "APPROVED" },
       select: { categoryId: true, progress: { where: { userId }, select: { mark: true } } },
@@ -43,6 +45,7 @@ export async function getHomeSummary(
     db.flashcard.count({ where: { authorId: userId, status: "APPROVED" } }),
     db.flashcard.count({ where: { authorId: userId, status: "REJECTED" } }),
     db.category.findMany({ orderBy: { position: "asc" }, select: { id: true, name: true } }),
+    db.studySession.count({ where: { userId } }),
   ]);
 
   const toInput = (rows: typeof approved): FlashcardCountInput[] =>
@@ -79,5 +82,6 @@ export async function getHomeSummary(
     categories,
     own: { pending, approved: approvedCount, rejected },
     pendingQueue: isAdmin ? await getPendingQueueCount() : undefined,
+    sessionsCount,
   };
 }

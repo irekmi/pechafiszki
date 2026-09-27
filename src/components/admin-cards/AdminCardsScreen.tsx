@@ -1,10 +1,10 @@
 import { NoMatch } from "@/components/library/LibraryEmpty";
 import { Page, Stack } from "@/components/ui/Page";
+import { ToastBoard } from "@/components/ui/ToastBoard";
 import { ADMIN_CARDS_PATH } from "@/server/services/adminCardsPath";
 import { adminCardsQuery, type AdminCardsParams } from "@/server/services/adminCardsParams";
 import type { AdminCardsPage } from "@/server/services/adminListFlashcards";
 import type { CategoryRow } from "@/server/services/listCategories";
-import { AdminCardsBoard } from "./AdminCardsBoard";
 import { AdminCardsFilters } from "./AdminCardsFilters";
 import { AdminCardsFooter } from "./AdminCardsFooter";
 import { AdminCardsHead } from "./AdminCardsHead";
@@ -21,7 +21,7 @@ export function AdminCardsScreen({ page, params, categories }: AdminCardsScreenP
   return (
     <Page>
       <AdminCardsHead counts={page.counts} />
-      <AdminCardsBoard>
+      <ToastBoard message="Fiszka usunięta">
         <Stack>
           <AdminCardsFilters key={adminCardsQuery({ ...params, limit: undefined })} categories={categories} params={params} />
           {page.total === 0 ? (
@@ -33,7 +33,7 @@ export function AdminCardsScreen({ page, params, categories }: AdminCardsScreenP
             </>
           )}
         </Stack>
-      </AdminCardsBoard>
+      </ToastBoard>
     </Page>
   );
 }

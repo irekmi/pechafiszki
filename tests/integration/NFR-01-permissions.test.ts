@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
+import { Refusal, asSessionMock, refusalFrom, signedInWithRow } from "./setup/mockSession";
 
 /**
  * `src/server/permissions.ts` — the session reader and its decisions, exercised as Guest, User and
@@ -32,7 +32,7 @@ const { auth } = await import("@/server/auth");
 const { currentUser, requireAdmin, requireUser } = await import("@/server/permissions");
 
 const authMock = asSessionMock(auth);
-const signedIn = (role: "USER" | "ADMIN") => authMock.mockResolvedValue(signedInSession(role));
+const signedIn = (role: "USER" | "ADMIN") => signedInWithRow(authMock, role);
 const guest = () => authMock.mockResolvedValue(null);
 
 beforeEach(() => {
@@ -48,9 +48,9 @@ describe("NFR-01 — the session reader", () => {
   });
 
   it("reports the role the session carries, for both signed-in roles", async () => {
-    signedIn("USER");
+    await signedIn("USER");
     expect(await currentUser()).toMatchObject({ id: 7, role: "USER" });
-    signedIn("ADMIN");
+    await signedIn("ADMIN");
     expect(await currentUser()).toMatchObject({ id: 7, role: "ADMIN" });
   });
 });
@@ -68,9 +68,9 @@ describe("NFR-01 — requireUser", () => {
     expect((await refusalFrom(() => requireUser())).target).toBe("/logowanie");
   });
   it("lets a User and an Administrator through", async () => {
-    signedIn("USER");
+    await signedIn("USER");
     await expect(requireUser()).resolves.toMatchObject({ role: "USER" });
-    signedIn("ADMIN");
+    await signedIn("ADMIN");
     await expect(requireUser()).resolves.toMatchObject({ role: "ADMIN" });
   });
 });
@@ -82,19 +82,19 @@ describe("NFR-01 — requireAdmin (DEC-57)", () => {
   });
 
   it("refuses a signed-in User with the 403 variant", async () => {
-    signedIn("USER");
+    await signedIn("USER");
     expect((await refusalFrom(() => requireAdmin())).kind).toBe("forbidden");
   });
 
   it("ignores a role claimed in a request header (AC-03.5)", async () => {
-    signedIn("USER");
+    await signedIn("USER");
     requestHeaders.set("x-role", "ADMIN");
     requestHeaders.set("role", "ADMIN");
     expect((await refusalFrom(() => requireAdmin())).kind).toBe("forbidden");
   });
 
   it("lets an Administrator through", async () => {
-    signedIn("ADMIN");
+    await signedIn("ADMIN");
     await expect(requireAdmin()).resolves.toMatchObject({ role: "ADMIN" });
   });
 });

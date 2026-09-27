@@ -11,6 +11,8 @@ export type AdminCardsParams = {
   query?: string;
   status?: (typeof ADMIN_CARD_STATUSES)[number];
   category?: number;
+  /** An account's id — SCR-20 links its submissions here (DEC-48). */
+  author?: number;
   sort: (typeof ADMIN_CARD_SORTS)[number];
   limit: number;
 };
@@ -34,6 +36,7 @@ export function parseAdminCardsParams(raw: RawParams): AdminCardsParams {
     query: querySchema.parse(first(raw.query)),
     status: status.parse(first(raw.status) || undefined),
     category: categorySchema.parse(first(raw.category) || undefined),
+    author: categorySchema.parse(first(raw.author) || undefined),
     sort: sort.parse(first(raw.sort)),
     limit: limitSchema.parse(first(raw.limit) ?? LIBRARY_PAGE_SIZE),
   };
@@ -45,6 +48,7 @@ export function adminCardsQuery(params: Partial<AdminCardsParams>): string {
   if (params.query) search.set("query", params.query);
   if (params.status) search.set("status", params.status);
   if (params.category) search.set("category", String(params.category));
+  if (params.author) search.set("author", String(params.author));
   if (params.sort && params.sort !== "newest") search.set("sort", params.sort);
   if (params.limit && params.limit !== LIBRARY_PAGE_SIZE) search.set("limit", String(params.limit));
   const text = search.toString();

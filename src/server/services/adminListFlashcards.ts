@@ -33,6 +33,7 @@ function where(params: AdminCardsParams): Prisma.Sql {
   const parts = [Prisma.sql`TRUE`];
   if (params.status) parts.push(Prisma.sql`f."status" = ${STATUS[params.status]}`);
   if (params.category) parts.push(Prisma.sql`f."categoryId" = ${params.category}`);
+  if (params.author) parts.push(Prisma.sql`f."authorId" = ${params.author}`);
   if (params.query) parts.push(foldedSearch(params.query));
   return Prisma.join(parts, " AND ");
 }

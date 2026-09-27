@@ -2,7 +2,7 @@ import { hash, verify } from "argon2";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/server/db";
 import { createUser, resetDatabase } from "./setup/fixtures";
-import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
+import { Refusal, asSessionMock, refusalFrom, signedInWithRow } from "./setup/mockSession";
 
 /**
  * REQ-05 / SCR-03 / SCR-04 / API-03 / API-04 / API-05 — exercised through the real actions and
@@ -160,7 +160,7 @@ describe("SCR-03 / API-03 — requestPasswordReset", () => {
   });
 
   it("refuses a signed-in caller, sends nothing (CLAUDE.md §8)", async () => {
-    authMock.mockResolvedValue(signedInSession("USER"));
+    await signedInWithRow(authMock, "USER");
     const refusal = await refusalFrom(() =>
       requestPasswordResetAction(emptyResetHaslaState, form({ email: "known@example.test" })),
     );
@@ -278,7 +278,7 @@ describe("SCR-04 / API-05 — setNewPassword", () => {
     const user = await createUser({ email: "known@example.test" });
     const raw = await issueToken(user.email);
 
-    authMock.mockResolvedValue(signedInSession("ADMIN"));
+    await signedInWithRow(authMock, "ADMIN");
     const refusal = await refusalFrom(() =>
       setNewPasswordAction(
         { invalid: false },

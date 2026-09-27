@@ -49,6 +49,7 @@ export function AdminCardsFilters({ categories, params }: { categories: Category
 
   return (
     <FilterBar role="search" action={ADMIN_CARDS_PATH} method="get" onSubmit={submit}>
+      {params.author ? <input type="hidden" name="author" value={params.author} /> : null}
       <SearchField value={text} onChange={setText} placeholder="np. indeks, useMemo, 403" />
       <FilterSelect id="status" label="Status" value={params.status ?? ""} options={STATUSES} />
       <FilterSelect

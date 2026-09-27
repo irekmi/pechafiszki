@@ -42,3 +42,15 @@ export function AllReviewedArt() {
     </svg>
   );
 }
+
+/** `13-moje-statystyki-pusty.html` — four ascending bars: nothing measured yet. */
+export function StatsArt() {
+  return (
+    <svg viewBox="0 0 132 92" aria-hidden="true" className="block w-full h-full">
+      <rect x="20" y="58" width="18" height="20" rx="4" className="fill-surface-3" />
+      <rect x="46" y="44" width="18" height="34" rx="4" className="fill-surface-3" />
+      <rect x="72" y="30" width="18" height="48" rx="4" className="fill-accent-soft stroke-brand" strokeWidth="2" />
+      <rect x="98" y="16" width="18" height="62" rx="4" className="fill-accent-soft stroke-brand" strokeWidth="2" fillOpacity="0.6" />
+    </svg>
+  );
+}

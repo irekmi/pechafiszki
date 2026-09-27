@@ -3,7 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/server/db";
 import { authorizeCredentials, verifyCredentials } from "@/server/services/signIn";
 import { resetDatabase } from "./setup/fixtures";
-import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
+import { Refusal, asSessionMock, refusalFrom, signedInWithRow } from "./setup/mockSession";
 
 /** The real argon2, with `verify` observed: the timing claim is about the code path it runs. */
 const { verifySpy } = vi.hoisted(() => ({ verifySpy: vi.fn() }));
@@ -131,13 +131,13 @@ describe("API-02 — action signIn", () => {
 
 describe("API-02 — action signIn, session guard (ISS-05)", () => {
   it("redirects a signed-in User/Administrator calling the action directly, no sign-in attempt", async () => {
-    authMock.mockResolvedValue(signedInSession("USER"));
+    await signedInWithRow(authMock, "USER");
     expect(
       (await refusalFrom(() => signInAction(emptySignInState, form(LEARNER)))).target,
     ).toBe("/");
     expect(signInMock).not.toHaveBeenCalled();
 
-    authMock.mockResolvedValue(signedInSession("ADMIN"));
+    await signedInWithRow(authMock, "ADMIN");
     expect(
       (await refusalFrom(() => signInAction(emptySignInState, form(ADMIN)))).target,
     ).toBe("/");

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
+import { Refusal, asSessionMock, refusalFrom, signedInWithRow } from "./setup/mockSession";
 
 /**
  * The two refusal shapes `permissions.ts` offers besides a redirect and a 403: the 404 a hidden
@@ -38,7 +38,7 @@ describe("NFR-01 — the other two refusal shapes", () => {
     expect(await hasStaleSessionCookie()).toBe(false);
     cookieNames = ["authjs.session-token"];
     expect(await hasStaleSessionCookie()).toBe(true);
-    authMock.mockResolvedValue(signedInSession("USER"));
+    await signedInWithRow(authMock, "USER");
     expect(await hasStaleSessionCookie()).toBe(false);
   });
 });

@@ -9,16 +9,19 @@ export const PASSWORD = "correct horse battery staple";
 export const ADMIN = { email: "admin@example.test", password: "correct horse battery staple e2e" };
 export const stamp = () => `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
-export async function register(page: Page): Promise<void> {
+/** Registers and signs in a fresh User; answers the credentials, so an administrator's screen can find the account. */
+export async function register(page: Page): Promise<{ email: string; nickname: string }> {
   const id = stamp();
+  const account = { email: `review-${id}@example.test`, nickname: `rev_${id.slice(-9)}` };
   await page.goto("/rejestracja");
   await page.waitForLoadState("networkidle");
-  await page.fill("#email", `review-${id}@example.test`);
-  await page.fill("#nickname", `rev_${id.slice(-9)}`);
+  await page.fill("#email", account.email);
+  await page.fill("#nickname", account.nickname);
   await page.fill("#password", PASSWORD);
   await page.fill("#password_repeat", PASSWORD);
   await page.click('button[type="submit"]');
   await page.waitForURL((url) => url.pathname === "/");
+  return account;
 }
 
 /** Submits through SCR-10, as the signed-in author, and waits for SCR-11. */

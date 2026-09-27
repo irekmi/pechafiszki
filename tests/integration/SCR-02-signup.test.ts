@@ -2,7 +2,7 @@ import { verify } from "argon2";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/server/db";
 import { createUser, resetDatabase } from "./setup/fixtures";
-import { Refusal, asSessionMock, refusalFrom, signedInSession } from "./setup/mockSession";
+import { Refusal, asSessionMock, refusalFrom, signedInWithRow } from "./setup/mockSession";
 
 /**
  * SCR-02 / API-01 — exercised through the real server action and the real database, as
@@ -58,9 +58,9 @@ describe("SCR-02 — access (public, redirected away when already signed in)", (
   });
 
   it("redirects a signed-in User and Administrator to /", async () => {
-    authMock.mockResolvedValue(signedInSession("USER"));
+    await signedInWithRow(authMock, "USER");
     expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/");
-    authMock.mockResolvedValue(signedInSession("ADMIN"));
+    await signedInWithRow(authMock, "ADMIN");
     expect((await refusalFrom(() => RejestracjaPage())).target).toBe("/");
   });
 });
@@ -135,13 +135,13 @@ describe("API-01 — action signUp", () => {
   });
 
   it("refuses a signed-in User/Administrator calling the action directly, no row written (CLAUDE.md §8)", async () => {
-    authMock.mockResolvedValue(signedInSession("USER"));
+    await signedInWithRow(authMock, "USER");
     expect((await refusalFrom(() => signUpAction(emptySignUpState, form(FRESH)))).target).toBe(
       "/",
     );
     expect(await db.user.count({ where: { email: FRESH.email } })).toBe(0);
 
-    authMock.mockResolvedValue(signedInSession("ADMIN"));
+    await signedInWithRow(authMock, "ADMIN");
     expect((await refusalFrom(() => signUpAction(emptySignUpState, form(FRESH)))).target).toBe(
       "/",
     );

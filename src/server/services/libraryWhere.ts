@@ -29,13 +29,18 @@ function escapeLike(text: string): string {
   return text.replace(/[\\%_]/g, (char) => `\\${char}`);
 }
 
+/** The `LIKE` pattern of a search phrase: folded, its metacharacters escaped, wrapped for substring matching. */
+export function foldedLikePattern(query: string): string {
+  return `%${escapeLike(foldText(query))}%`;
+}
+
 /**
  * DEC-49: the phrase is folded by the domain function, the columns by `fold_text` — the expression the
  * two GIN trigram indexes of the library_search_fold migration are built on. Alias `f` is Flashcard;
  * the phrase is a bound parameter with its `LIKE` metacharacters escaped (ISS-12).
  */
 export function foldedSearch(query: string): Prisma.Sql {
-  const pattern = `%${escapeLike(foldText(query))}%`;
+  const pattern = foldedLikePattern(query);
   return Prisma.sql`(fold_text(f."question") LIKE ${pattern} OR fold_text(f."answer") LIKE ${pattern})`;
 }
 

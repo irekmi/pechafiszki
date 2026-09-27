@@ -19,3 +19,6 @@ export function TableSub({ children }: { children: ReactNode }) {
 export function TableActions({ children }: { children: ReactNode }) {
   return <span className="flex gap-2 justify-end">{children}</span>;
 }
+
+/** `.table__num` — a right-aligned figure with tabular digits. */
+export const TABLE_NUM_CLASS = "text-right tabular-nums";

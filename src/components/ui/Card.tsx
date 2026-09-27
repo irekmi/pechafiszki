@@ -4,17 +4,19 @@ import { cn } from "./cn";
 type CardProps = {
   tint?: boolean;
   flat?: boolean;
+  /** `.tile--accent` applied to a `.card` — SCR-13's weekly card, not a `Tile`. */
+  accent?: boolean;
   className?: string;
   children: ReactNode;
 };
 
 /** `.card` — the panel every screen groups content in. */
-export function Card({ tint, flat, className, children }: CardProps) {
+export function Card({ tint, flat, accent, className, children }: CardProps) {
   return (
     <section
       className={cn(
         "border-2 border-ink rounded-md p-5.5",
-        tint ? "bg-surface-2" : "bg-surface",
+        accent ? "bg-brand text-on-brand" : tint ? "bg-surface-2" : "bg-surface",
         flat ? "shadow-none" : "shadow-hard",
         className,
       )}
@@ -32,9 +34,19 @@ export function CardHead({ className, children }: { className?: string; children
   );
 }
 
-export function CardFoot({ className, children }: { className?: string; children: ReactNode }) {
+export function CardFoot({
+  accent,
+  className,
+  children,
+}: {
+  accent?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
-    <div className={cn("mt-4.5 pt-3.5 border-t border-line", className)}>{children}</div>
+    <div className={cn("mt-4.5 pt-3.5 border-t", accent ? "border-brand-line" : "border-line", className)}>
+      {children}
+    </div>
   );
 }
 

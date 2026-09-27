@@ -59,8 +59,12 @@ export async function authorizeCredentials(raw: unknown): Promise<AuthenticatedU
   return verifyCredentials(parsed.data.email, parsed.data.password);
 }
 
-/** A malformed digest must fail like a wrong password, not crash the request. */
-async function verifyQuietly(digest: string, password: string): Promise<boolean> {
+/**
+ * A malformed digest must fail like a wrong password, not crash the request. Exported so API-36 /
+ * API-37 verify the session user's own current password (`verifyCurrentPassword.ts`) with the same
+ * quiet failure, rather than a second `try`/`catch` around `argon2.verify`.
+ */
+export async function verifyQuietly(digest: string, password: string): Promise<boolean> {
   try {
     return await verify(digest, password);
   } catch {

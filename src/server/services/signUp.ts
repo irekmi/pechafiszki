@@ -11,10 +11,15 @@ import { db } from "@/server/db";
  * (stage-04 task 2) — there is only one definition of "a valid registration".
  */
 
-/** DEC-44 — letters incl. Polish, digits, `_` and `-`, 3–24 characters, as a single rule. */
+/**
+ * DEC-44 — letters incl. Polish, digits, `_` and `-`, 3–24 characters, as a single rule. Exported so
+ * API-35 (`updateNickname.ts`) validates a nickname change by the exact same rule as registration,
+ * rather than a second regex that could drift from this one.
+ */
 const NICKNAME_PATTERN = /^[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_-]{3,24}$/;
 const NICKNAME_MESSAGE =
   "Pseudonim może zawierać litery, cyfry, znak podkreślenia i myślnik, od 3 do 24 znaków";
+export const nicknameSchema = z.string().trim().regex(NICKNAME_PATTERN, NICKNAME_MESSAGE);
 
 export const signUpSchema = z
   .object({
@@ -24,7 +29,7 @@ export const signUpSchema = z
       .min(1, "E-mail jest wymagany")
       .max(320)
       .email("Podaj poprawny adres e-mail"),
-    nickname: z.string().trim().regex(NICKNAME_PATTERN, NICKNAME_MESSAGE),
+    nickname: nicknameSchema,
     password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków").max(1024),
     password_repeat: z.string().min(1, "Powtórz hasło jest wymagane").max(1024),
   })
